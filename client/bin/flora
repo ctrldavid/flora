@@ -1,0 +1,15 @@
+#!/usr/bin/env coffee
+
+server = require '../server/server'
+path = require 'path'
+
+
+switch command = process.argv[2]
+  when 'serve'
+    appPath = path.join process.cwd(), process.argv[3]
+    port = process.argv[4]
+    server.listen appPath, port
+
+
+
+

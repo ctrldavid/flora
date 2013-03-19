@@ -103,6 +103,10 @@ define [
 
       return dfd
 
+    unload: ->
+      @el.remove()
+      @_live = false
+
     reRender: ->
       # Not sure how this should work, perhaps a full reset, or just start with
       # 'loaded' and continue from there?
