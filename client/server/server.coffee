@@ -90,3 +90,5 @@ module.exports.listen = (applicationPath, port = 3000) ->
 
   console.log "Listening on port #{port}"
   app.listen port
+
+module.exports.listen()

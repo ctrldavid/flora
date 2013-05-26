@@ -1,14 +1,10 @@
 {
-  "name": "client",
+  "name": "flora-ws",
   "version": "0.0.0",
-  "description": "Flowers Client",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "description": "Flora web server",
+  "bin": {
+    "flora": "./bin/flora"
   },
-  "repository": "",
-  "author": "",
-  "license": "BSD",
   "dependencies": {
     "jade": "~0.27.7",
     "fibers": "~0.6.9",
