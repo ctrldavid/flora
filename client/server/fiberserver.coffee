@@ -17,80 +17,71 @@ futures =
   readFile: Future.wrap fs.readFile
   stylusRender: Future.wrap stylus.render 
 
+compileTargets = 
+  'js':
+    'js': (data) -> data
+    'coffee': (data) -> coffee.compile data.toString()
+    'jade': (data) ->
+      template = jade.compile data.toString(), {pretty: false, client: true, compileDebug: false}
+      return "define(['vendor/jade.runtime'],function(){return #{template};});"
+  'css':
+    'css': (data) -> data
+    'styl': (data) -> futures.stylusRender(data.toString()).wait()
+  'images':
+    'png': (data) -> data
+    'jpg': (data) -> data
+    'jpeg': (data) -> data
+    'gif': (data) -> data
+
+compiledServe = (dirs, exts) ->
+  ({params: [filename, type]}, res) ->
+    for directory in dirs
+      for ext, handler of exts
+        filePath = path.join directory, "#{filename}.#{ext}"
+        #console.log "Trying #{filePath}"
+        continue unless futures.isFile(filePath).wait()
+        data = futures.readFile(filePath).wait()
+        console.log "#{type}: #{filename} -> #{filePath}"
+        res.contentType type
+        res.send handler data
+        return
+    res.send 404, ''
+
 
 listen = (applicationPath="/", port = 3000) ->
+  # This points to the directory this file is in.
+  frameworkPath = path.join __dirname, '../framework'
+
+  sourceDirectories = [frameworkPath, applicationPath]  # App files take precedence
+
   app = express()
   app.set 'views', ''  
 
   # Respond to all requests using fibers
   app.use (req, res, next) -> next.future()()
 
-  # This points to the directory this file is in.
-  frameworkPath = path.join __dirname, '../framework'
-
   # js file handling
-  app.get /^\/(.*)\.js$/, ({params: [filename]}, res) ->
-    filePaths = []
-    for directory in [frameworkPath]#, applicationPath]  # App files take precedence
-      for ext in ['coffee', 'jade', 'js']
-        filePath = path.join directory, "#{filename}.#{ext}"
-        filePaths.push {ext, filePath}
+  app.get /^\/(.*)\.(js)$/, compiledServe sourceDirectories, compileTargets.js
 
-    while {filePath, ext} = filePaths.pop()
-      break unless filePath?
-      if futures.isFile(filePath).wait()
-        data = futures.readFile(filePath).wait()
-        console.log 'JS: ', filename, '->', filePath
-        res.contentType 'js'
-        switch ext
-          when 'js'
-            response = data
-          when 'coffee'
-            response = coffee.compile data.toString()
-          when 'jade'
-            template = jade.compile data.toString(), {pretty: false, client: true, compileDebug: false}
-            response = "define(['vendor/jade.runtime'],function(){return #{template};});"
-        res.send response
-        return
-    console.log 'Failed to find', filename
-
-  app.get /^\/(.*)\.css$/, ({params: [filename]}, res) ->
-    filePaths = []
-    for directory in [frameworkPath]#, applicationPath]  # App files take precedence
-      for ext in ['styl', 'css']
-        filePath = path.join directory, "#{filename}.#{ext}"
-        filePaths.push {ext, filePath}    
-
-    while {filePath, ext} = filePaths.pop()
-      break unless filePath?
-      if futures.isFile(filePath).wait()
-        data = futures.readFile(filePath).wait()
-        console.log 'CSS:', filename, '->', filePath
-        res.contentType 'css'
-        switch ext
-          when 'css'
-            response = data
-          when 'styl'
-            response = futures.stylusRender(data.toString()).wait()
-        res.send response
-        return
-    console.log 'Failed to find', filename
-
+  # css file handling
+  app.get /^\/(.*)\.(css)$/, compiledServe sourceDirectories, compileTargets.css
 
   # Images
-  app.get /^\/(.*)\.(png|jpg|jpeg|gif)$/, ({params: [filename, ext]}, res) ->
-    filePaths = []
-    for directory in [frameworkPath]#, applicationPath]  # App files take precedence
-      filePath = path.join directory, "#{filename}.#{ext}"
-      filePaths.push {ext, filePath}    
+  app.get /^\/(.*)\.(png|jpg|jpeg|gif)$/, compiledServe sourceDirectories, compileTargets.images
 
-    while {filePath, ext} = filePaths.pop()
-      break unless filePath?
-      if futures.isFile(filePath).wait()
-        console.log 'PNG:', filename, '->', filePath
-        res.sendfile filePath
-        return
-    console.log 'Failed to find', filename
+  # app.get /^\/(.*)\.(png|jpg|jpeg|gif)$/, ({params: [filename, ext]}, res) ->
+  #   filePaths = []
+  #   for directory in [frameworkPath]#, applicationPath]  # App files take precedence
+  #     filePath = path.join directory, "#{filename}.#{ext}"
+  #     filePaths.push {ext, filePath}    
+
+  #   while {filePath, ext} = filePaths.pop()
+  #     break unless filePath?
+  #     if futures.isFile(filePath).wait()
+  #       console.log 'PNG:', filename, '->', filePath
+  #       res.sendfile filePath
+  #       return
+  #   console.log 'Failed to find', filename
 
   console.log "\n\n\nServing: ", frameworkPath, applicationPath
   app.get '*', (req, res) ->
