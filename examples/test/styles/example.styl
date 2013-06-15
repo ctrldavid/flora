@@ -1,0 +1,38 @@
+// Dark
+fore-color = rgba(168,168,168,1.0)
+back-color-1 = rgba(16,16,18,1.0)
+back-color-2 = rgba(32,32,36,1.0)
+
+// Dirt
+fore-color = rgba(148,168,116,1.0)
+back-color-1 = rgba(16,12,6,1.0)
+back-color-2 = rgba(36,32,16,1.0)
+
+
+html
+  height: 100%
+  background-image: url('../images/dirt.png'), radial-gradient(ellipse 200% 100% at 50% 100%, back-color-1, back-color-2)
+  font-family: sans-serif
+  color: fore-color
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5)
+
+.messagebox
+  position: relative
+  top: 120px
+  width: 480px  
+  margin: 0px auto
+  border: solid 2px fore-color
+  border-radius: 4px
+  box-shadow: 2px 2px 12px rgba(0,0,0,0.5)
+  background-color: rgba(0,0,0,0.2)
+
+
+  h3
+    margin: 8px
+    text-align: center
+
+  .text
+    margin: 8px
+    font-size: 14px
+    p
+      margin: 0.5em 0

@@ -12,7 +12,7 @@ Latest ver from: http://redis.io/download
 cd tmp
 wget http://redis.googlecode.com/files/redis-2.6.13.tar.gz
 tar xzf redis-2.6.13.tar.gz
-redis-2.6.13
+cd redis-2.6.13
 make
 
 link binaries with
