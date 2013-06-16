@@ -7,6 +7,7 @@ define [
 ], ($, View, Application, layoutT, messageboxT) ->
 
   class ExampleApp extends Application
+    title: "Test page"
     template: layoutT
     render: ->
       @messageBox = new MessageBox
