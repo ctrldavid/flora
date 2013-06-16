@@ -2,22 +2,18 @@ define [
   '$'
   'view'
   'application'
+  'views/wsconsole'
   'templates/layout'
-  'templates/messagebox'
-], ($, View, Application, layoutT, messageboxT) ->
+], ($, View, Application, {ConsoleView}, layoutT) ->
 
   class ExampleApp extends Application
     title: "Test page"
     template: layoutT
     render: ->
-      @messageBox = new MessageBox
-      @waitOn @append '.js-messagebox', @messageBox
+      @console = new ConsoleView
+      @waitOn @append '.js-console', @console
 
     appeared: ->
-
-  class MessageBox extends View
-    template: messageboxT
-
 
 
   (new ExampleApp).start()

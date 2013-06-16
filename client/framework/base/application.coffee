@@ -5,7 +5,8 @@ define [
 
   class Application extends View
     start: ->
-      @appendTo $ 'body'
-      $('title').text @title if @title?
+      $ =>
+        @appendTo $ 'body'
+        $('title').text @title if @title?
 
   return Application

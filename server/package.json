@@ -11,6 +11,8 @@
   "license": "BSD",
   "dependencies": {
     "redis": "~0.8.3",
-    "fibers": "~1.0.1"
+    "fibers": "~1.0.1",
+    "node-uuid": "~1.4.0",
+    "ws": "~0.4.25"
   }
 }
