@@ -36,4 +36,5 @@ define [
       @locals.text = @model.frame
       @locals.direction = @model.direction
 
+    attach: (methods) -> methods.prepend
   {ConsoleView}

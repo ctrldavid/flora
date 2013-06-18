@@ -46,7 +46,9 @@ define [
         # $.when(undefined) will resolve immediately)
         # or if the parent is already _live $.when(true) will also resolve immediately
         $.when(view.parent?._live || view.parent?.eventDeferred 'appeared').then ->
-          view.parentElement.append view.el
+          # call view.attach() to get attachment logic.
+          # view.parentElement.append view.el
+          view.attach(attachMethods) view
           view._live = true
           view.appeared?()
           view.trigger 'appeared'
@@ -61,6 +63,12 @@ define [
         else
           dfd.resolve()
       dfd.promise()
+
+  attachMethods =
+    append: (view) ->
+      view.parentElement.append view.el
+    prepend: (view) ->
+      view.parentElement.prepend view.el
 
   class View extends Backbone.View
     # trigger: ->
@@ -87,6 +95,10 @@ define [
       this.parentElement = targetElement
       viewMethods.init this
 
+    prepend: (target, view) ->
+      view.attach = (methods) -> methods.prepend
+      @append target, view
+
     append: (target, view) ->
       if typeof target == "string"
         target = @$el.find target
@@ -102,6 +114,8 @@ define [
       view.appendTo target
 
       return dfd
+
+    attach: (methods) -> methods.append
 
     unload: ->
       @el.remove()
