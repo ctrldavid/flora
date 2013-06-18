@@ -19,6 +19,7 @@ require.config
     
     view: 'base/view'
     application: 'base/application'
+    events: 'base/events'
 
 require [
   'main'

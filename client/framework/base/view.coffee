@@ -66,7 +66,6 @@ define [
     # trigger: ->
     #   console.log 'T2: ', @cid, arguments
     #   super
-
     constructor: ->
       super
       @_waits = []
@@ -84,7 +83,7 @@ define [
       @_waits.push dfd
 
     appendTo: (targetElement) ->
-      this.parentElement = targetElement
+      @parentElement = targetElement
       viewMethods.init this
 
     append: (target, view) ->

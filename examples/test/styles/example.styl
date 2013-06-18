@@ -10,19 +10,21 @@ color-2 = rgba(192,64,64,1.0)
 html
   height: 100%
   background-image: url('../images/dirt.png'), radial-gradient(ellipse 200% 100% at 50% 100%, back-color-1, back-color-2)
+  background-attachment: fixed
   font-family: sans-serif
   color: fore-color
   text-shadow: 1px 1px 3px rgba(0,0,0,0.5)
 
 .console
   position: relative
-  top: 120px
+  top: 0px
   width: 640px  
-  margin: 0px auto
+  margin: 120px auto
   border: solid 2px fore-color
   border-radius: 4px
   box-shadow: 2px 2px 12px rgba(0,0,0,0.5)
   background-color: rgba(0,0,0,0.2)
+  padding-bottom: 16px
 
   h3
     margin: 8px
@@ -43,17 +45,21 @@ html
     margin: 0px auto
     overflow: hidden
     height: 28px
-    input.frame
+    .frame
       position: absolute
+      display: block
       left: 1px
       top: 1px
       bottom: 1px
-      right: 50px
-      padding: 0px 6px
-      border: none
-      background-color: rgba(0,0,0,0.8)
-      text-align: left
-      color: fore-color
+      right: 64px
+      input
+        width: 100%
+        height: 100%
+        padding: 0px 6px
+        border: none
+        background-color: rgba(0,0,0,0.8)
+        text-align: left
+        color: fore-color
     input.send
       position: absolute
       right: 1px
