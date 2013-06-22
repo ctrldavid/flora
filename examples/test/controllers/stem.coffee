@@ -11,13 +11,16 @@ define [
       _initialised = true
 
     receive: (message) =>
-      data = message.data
+      data = JSON.parse message.data
       console.log data
       @trigger 'receive', data
-    send: (message) ->
-      console.log message
-      @ws.send message
-      @trigger 'send', message
+      if data.channel?
+        @trigger "receive-#{data.channel}", data
+    send: (channel, message) ->
+      @ws.send {channel, data:message}
+      @trigger 'send', {channel, data:message}
+
+
 
   # Oh shit son singleton y'all gonna get wrecked
   return new Stem
