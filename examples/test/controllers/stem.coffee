@@ -12,13 +12,13 @@ define [
 
     receive: (message) =>
       data = JSON.parse message.data
-      console.log data
       @trigger 'receive', data
       if data.channel?
         @trigger "receive-#{data.channel}", data
     send: (channel, message) ->
-      @ws.send {channel, data:message}
-      @trigger 'send', {channel, data:message}
+      frame = {channel, data:message}
+      @ws.send JSON.stringify frame
+      @trigger 'send', frame
 
 
 
