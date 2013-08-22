@@ -2,10 +2,11 @@ define [
   '$'
   'view'
   'controllers/stem'
+  'models/redis_model'
   'templates/wsdebug'
   'templates/wsframe'
-], ($, View, Stem, debugT, frameT) ->
-
+], ($, View, Stem, RM, debugT, frameT) ->
+  window.RM = RM
   class DebugView extends View
     template: debugT
     events: {}

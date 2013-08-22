@@ -18,6 +18,8 @@ define [
       channel = @$('.js-channel').val()
       data = @$('.js-data').val()
       @$('.js-data').val ''
-      @stem.send channel, data
+      data.command ?= channel
+      data.channel = channel
+      @stem.send data
 
   {ConsoleView}
