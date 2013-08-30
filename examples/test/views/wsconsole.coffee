@@ -7,9 +7,10 @@ define [
 
   class ConsoleView extends View
     template: consoleT
-    events: 
+    events:
       'click .js-send': 'send'
       'keydown .js-data': (e) -> @send() if e.which == 13
+      'click .js-go': () -> window.setInterval echo, 0
 
     init: ->
       @stem = Stem
@@ -18,8 +19,7 @@ define [
       channel = @$('.js-channel').val()
       data = @$('.js-data').val()
       @$('.js-data').val ''
-      data.command ?= channel
-      data.channel = channel
-      @stem.send data
+      @stem.send {data, channel, command:channel}
 
+  window.echo = () -> Stem.send {data:'test', channel:'echo', command:'echo'}
   {ConsoleView}
