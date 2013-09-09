@@ -5,8 +5,9 @@ define [
   'controllers/stem'
   'views/wsconsole'
   'views/wsdebug'
+  'views/chat'
   'templates/layout'
-], ($, View, Application, Stem, {ConsoleView}, {DebugView}, layoutT) ->
+], ($, View, Application, Stem, {ConsoleView}, {DebugView}, {ChatView}, layoutT) ->
 
   class ExampleApp extends Application
     title: "Test page"
@@ -20,6 +21,9 @@ define [
 
       @debug = new DebugView
       @waitOn @append '.js-debug', @debug
+
+      @chat = new ChatView
+      @append '.js-chat', @chat
 
     appeared: ->
 

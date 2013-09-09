@@ -1,0 +1,37 @@
+define [
+  '$'
+  'view'
+  'controllers/stem'
+  'models/redis_model'
+  'templates/wsdebug'
+  'templates/wsframe'
+], ($, View, Stem, RM, debugT, frameT) ->
+  window.RM = RM
+  class ChatView extends View
+    template: debugT
+    events: {}
+
+    init: ->
+      @stem = Stem
+      @stem.on 'receive', @addreceive
+      @stem.on 'send', @addsend
+
+    addreceive: (data) =>
+      @append '.js-frames', new FrameView model: {frame:data, direction:"from"}
+
+    addsend: (data) =>
+      @append '.js-frames', new FrameView model: {frame:data, direction:"to"}
+
+  class FrameView extends View
+    template: frameT
+    className: 'frame'
+    init: ->
+      @$el.addClass @model.direction
+
+    loaded: ->
+      @locals.text = JSON.stringify(@model.frame, null, '  ')#.replace /{|}/g, ''
+      @locals.direction = @model.direction
+
+    # attach: (methods) -> methods.prepend
+
+  {ChatView}

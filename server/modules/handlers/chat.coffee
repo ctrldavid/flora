@@ -14,9 +14,9 @@ class ChatHandler
     @channels = {}
   commands:
     'subscribe': (data, sender) ->
-      sender.send JSON.stringify new Message 'echo', {data: data.data}
+      sender.send new Message 'echo', {data: data.data}
 
   message: (msg, sender) ->
-    sender.send JSON.stringify new Message 'echo', msg.data
+    sender.send new Message 'echo', msg.data
 
 exports.ChatHandler = ChatHandler
