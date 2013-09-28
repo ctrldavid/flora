@@ -5,6 +5,14 @@ define [
   'events'
 ], (_, Backbone, $, Events) ->
 
+  class Channel extends Events
+    constructor: (@name, @stem) ->
+    
+    send: (command, data) ->
+      frame = {channel: @name, command, data}
+      @stem.send frame
+
+
   # The bit that handles the websocket.  This is where i'll put the longpolling
   # fallback when I get around to it. 
   # Still not sure how to interface with this. Could make a new object for each channel and listen
@@ -37,75 +45,41 @@ define [
       console.log "Added listener to #{channel}", listener
 
 
-
   controllerMethods =
-    lifecycle: (view, evt) ->
+    lifecycle: (controller, evt) ->
       dfd = $.Deferred()
-      view[evt]?()
-      viewMethods.eventLoop(view, evt).then ->
+      controller[evt]?()
+      controllerMethods.eventLoop(controller, evt).then ->
         dfd.resolve()
       dfd.promise()
 
-    init: (view) ->
-      viewMethods.lifecycle(view, 'init').then ->
-        view.inited?()
-        view.trigger 'inited'
-        viewMethods.load view
+    init: (controller) ->
+      controllerMethods.lifecycle(controller, 'init').then ->
+        controller.inited?()
+        controller.trigger 'inited'
+        controllerMethods.load controller
 
-    load: (view) ->
-      viewMethods.lifecycle(view, 'load').then ->
-        view.loaded?()
-        view.trigger 'loaded'
-        viewMethods.render view
+    load: (controller) ->
+      controllerMethods.lifecycle(controller, 'load').then ->
+        controller.loaded?()
+        controller.trigger 'loaded'
+        # controllerMethods.render controller
 
-    render: (view) ->
-      view.$el.append view.template view.locals
-      viewMethods.lifecycle(view, 'render').then ->
-        view.rendered?()
-        view.trigger 'rendered'
-        viewMethods.appear view
-
-    appear: (view) ->
-      viewMethods.lifecycle(view, 'appear').then ->
-        # If the view has a parent wait till it has appeared before triggering
-        # for the current view. (If the view has no parent then
-        # $.when(undefined) will resolve immediately)
-        # or if the parent is already _live $.when(true) will also resolve immediately
-        $.when(view.parent?._live || view.parent?.eventDeferred 'appeared').then ->
-          # call view.attach() to get attachment logic.
-          # view.parentElement.append view.el
-          view.attach(attachMethods) view
-          view._live = true
-          view.appeared?()
-          view.trigger 'appeared'
-
-    eventLoop: (view, evt, dfd) ->
+    eventLoop: (controller, evt, dfd) ->
       dfd ?= $.Deferred()
-      view.trigger evt
-      $.when.apply($, view._waits).then ->
-        if view._waits.length > 0
-          view._waits = []
-          viewMethods.eventLoop view, evt, dfd
+      controller.trigger evt
+      $.when.apply($, controller._waits).then ->
+        if controller._waits.length > 0
+          controller._waits = []
+          controllerMethods.eventLoop controller, evt, dfd
         else
           dfd.resolve()
       dfd.promise()
 
-  attachMethods =
-    append: (view) ->
-      view.parentElement.append view.el
-    prepend: (view) ->
-      view.parentElement.prepend view.el
-
-  class View extends Backbone.View
-    # trigger: ->
-    #   console.log 'T2: ', @cid, arguments
-    #   super
+  class Controller extends Events
     constructor: ->
       super
       @_waits = []
-      @_subviews = []
-      @_live = false
-      @locals = {}
 
     # Helper method for turning an event into a deferred that can be waited on.
     eventDeferred: (evt) ->
@@ -116,39 +90,7 @@ define [
     waitOn: (dfd) ->
       @_waits.push dfd
 
-    appendTo: (targetElement) ->
-      @parentElement = targetElement
-      viewMethods.init this
+    command: (str, obj) ->
+      [channel, command] = str.split " "
 
-    prepend: (target, view) ->
-      view.attach = (methods) -> methods.prepend
-      @append target, view
-
-    append: (target, view) ->
-      if typeof target == "string"
-        target = @$el.find target
-
-      view.parent = this
-      @_subviews.push view
-
-      # Return a deferred that resolves when the view renders so the caller
-      # can wait on it.
-      dfd = view.eventDeferred 'rendered'
-
-      # Start the loading process
-      view.appendTo target
-
-      return dfd
-
-    attach: (methods) -> methods.append
-
-    unload: ->
-      @el.remove()
-      @_live = false
-
-    reRender: ->
-      # Not sure how this should work, perhaps a full reset, or just start with
-      # 'loaded' and continue from there?
-
-
-  return View
+  return Controller

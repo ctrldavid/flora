@@ -36,7 +36,7 @@ define [
 
   class RedisModel extends Events
     constructor: (@path) ->
-      controller.addModel @path, this      
+      controller.addModel @path, this
       @_data = {}
 
     load: (data) ->

@@ -21,9 +21,10 @@ require.config
     view: 'base/view'
     application: 'base/application'
     events: 'base/events'
+    controller: 'base/controller'
 
 require [
   'main'
 ], (Main) ->
-
+  document.getElementById('loader').style.display = 'none'
 

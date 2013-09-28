@@ -4,20 +4,30 @@ fs = require 'fs'
 path = require 'path'
 coffee = require 'coffee-script'
 stylus = require 'stylus'
+nib = require 'nib'
 Future = require 'fibers/future'
 Fiber = require 'fibers'
 
-stat = Future.wrap fs.stat
-futures = 
+futures =
+  stat: Future.wrap fs.stat
   isFile: (path) ->
     future = new Future
     fs.stat path, (err, stats) ->
       future.return !err && stats.isFile()
     future
   readFile: Future.wrap fs.readFile
-  stylusRender: Future.wrap stylus.render 
+  #stylusRender: Future.wrap stylus.render
+  stylusRender: (str, path) ->
+    future = new Future
+    stylus(str)
+      .set('filename', path)
+      #.set('compress', true)
+      .use(nib())
+      .render future.resolver() # Just takes (res, err) -> and throws err or returns res
+    future
 
-compileTargets = 
+
+compileTargets =
   'js':
     'js': (data) -> data
     'coffee': (data) -> coffee.compile data.toString()
@@ -55,7 +65,7 @@ listen = (applicationPath="/", port = 3000) ->
   sourceDirectories = [applicationPath, frameworkPath]  # App files take precedence
 
   app = express()
-  app.set 'views', frameworkPath  
+  app.set 'views', frameworkPath
 
   # Respond to all requests using fibers
   app.use (req, res, next) -> next.future()()
@@ -69,20 +79,6 @@ listen = (applicationPath="/", port = 3000) ->
   # Images
   app.get /^\/(.*)\.(png|jpg|jpeg|gif)$/, compiledServe sourceDirectories, compileTargets.images
 
-  # app.get /^\/(.*)\.(png|jpg|jpeg|gif)$/, ({params: [filename, ext]}, res) ->
-  #   filePaths = []
-  #   for directory in [frameworkPath]#, applicationPath]  # App files take precedence
-  #     filePath = path.join directory, "#{filename}.#{ext}"
-  #     filePaths.push {ext, filePath}    
-
-  #   while {filePath, ext} = filePaths.pop()
-  #     break unless filePath?
-  #     if futures.isFile(filePath).wait()
-  #       console.log 'PNG:', filename, '->', filePath
-  #       res.sendfile filePath
-  #       return
-  #   console.log 'Failed to find', filename
-
   console.log "\n\n\nServing: ", frameworkPath, applicationPath
   app.get '*', (req, res) ->
     res.render 'index.jade'
@@ -90,8 +86,7 @@ listen = (applicationPath="/", port = 3000) ->
   app.listen port
 
 
-
-
 module.exports.serve = (applicationPath, port) ->
   console.log "serve #{applicationPath} on #{port}"
   listen applicationPath, port
+

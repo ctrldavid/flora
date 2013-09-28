@@ -1,6 +1,53 @@
+@import 'nib'
 html
   height: 100%
   //background-image: radial-gradient(ellipse 100% 100% at 50% 100%, rgba(32,32,48,1.0), rgba(0,0,0,1.0))
   //background-image: url('images/cat.jpg')
+  background-color: rgba(0,0,0,1.0)
   body
     margin: 0px
+    
+@keyframes loading
+  from
+    left: 95%
+    opacity: 0.0
+  33%
+    opacity: 1.0
+  67%
+    left: 5%
+    opacity: 0.0
+  to
+    left: 5%
+    opacity: 0.0
+
+
+#loader
+  position: absolute
+  top: 33%
+  width: 100%
+
+  > div
+    position: absolute
+    height: 0px
+    opacity: 0.0
+    animation: loading 3s ease-in-out infinite
+
+    &:nth-child(1)
+      animation-delay: 0.0s
+    &:nth-child(2)
+      animation-delay: 0.25s
+    &:nth-child(3)
+      animation-delay: 0.50s
+    &:nth-child(4)
+      animation-delay: 0.75s
+    &:nth-child(5)
+      animation-delay: 1.0s
+
+    > div
+      position: relative
+      left: -50%
+      top: -36px
+      text-shadow: 0px 0px 16px rgba(255,255,255,1.0)
+      font-size: 72px
+      color: rgba(0,0,0,0.0)
+      font-family: sans-serif

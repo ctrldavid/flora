@@ -1,20 +1,18 @@
 define [
   '$'
   'view'
-  'controllers/stem'
+  'controllers/chat'
   'models/redis_model'
-  'templates/wsdebug'
+  'templates/chat/main'
   'templates/wsframe'
-], ($, View, Stem, RM, debugT, frameT) ->
+], ($, View, {ChatController}, RM, mainT, frameT) ->
   window.RM = RM
   class ChatView extends View
-    template: debugT
+    template: mainT
     events: {}
 
     init: ->
-      @stem = Stem
-      @stem.on 'receive', @addreceive
-      @stem.on 'send', @addsend
+      window.CC = new ChatController
 
     addreceive: (data) =>
       @append '.js-frames', new FrameView model: {frame:data, direction:"from"}
