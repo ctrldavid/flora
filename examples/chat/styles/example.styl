@@ -1,0 +1,34 @@
+// Dark
+fore-color = rgba(168,168,168,1.0)
+back-color-1 = rgba(27,27,32,1.0)
+back-color-2 = rgba(64,64,64,1.0)
+
+color-1 = rgba(64,168,64,1.0)
+color-2 = rgba(192,64,64,1.0)
+
+
+html
+  height: 100%
+  background-image: url('../images/dirt.png'), radial-gradient(ellipse 200% 100% at 50% 100%, back-color-1, back-color-2)
+  background-attachment: fixed
+  font-family: sans-serif
+  color: fore-color
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5)
+
+.chat-window
+  position: relative
+  margin: 40px auto 0px auto
+  width: 480px
+  height: 640px
+  padding: 0px
+  border: solid 2px fore-color
+
+  .message
+    position: absolute
+    display: block
+    bottom: 0px
+    width: 100%
+    padding: 0px
+    margin: 0px
+    box-sizing: border-box
+
