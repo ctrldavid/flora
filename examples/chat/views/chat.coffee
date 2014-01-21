@@ -6,16 +6,23 @@ define [
 ], ($, View, {ChatController}, mainT) ->
   class ChatView extends View
     template: mainT
-    events: {}
+    events:
+      'keydown .js-send-message': (e) -> @send() if e.which == 13
 
     init: ->
-      window.CC = new ChatController
+      @ChatController = new ChatController
+      window.CC = @ChatController
+      @ChatController.on 'message', @addMessage
 
-    addreceive: (data) =>
-      @append '.js-frames', new FrameView model: {frame:data, direction:"from"}
+    send: ->
+      text = @$('.js-send-message').val()
+      @$('.js-send-message').val ''
+      @ChatController.sendMessage text
 
-    addsend: (data) =>
-      @append '.js-frames', new FrameView model: {frame:data, direction:"to"}
+    addMessage: (msg) =>
+      message = $("<div></div>").addClass("message").text(msg.text);
+      @$('.messages').append message
+
 
 
 

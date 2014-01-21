@@ -1,18 +1,25 @@
 // Dark
-fore-color = rgba(168,168,168,1.0)
-back-color-1 = rgba(27,27,32,1.0)
-back-color-2 = rgba(64,64,64,1.0)
+fore-color(alpha=1.0)
+  rgba(168,168,168,alpha)
+back-color-1(alpha=1.0)
+  rgba(27,27,32,alpha)
+back-color-2(alpha=1.0)
+  rgba(64,64,64,alpha)
 
-color-1 = rgba(64,168,64,1.0)
-color-2 = rgba(192,64,64,1.0)
+color-1(alpha=1.0)
+  rgba(64,168,64,alpha)
+color-2(alpha=1.0)
+  rgba(192,64,64,alpha)
+
 
 
 html
   height: 100%
-  background-image: url('../images/dirt.png'), radial-gradient(ellipse 200% 100% at 50% 100%, back-color-1, back-color-2)
+  //background-image: url('../images/dirt.png'), radial-gradient(ellipse 200% 100% at 50% 100%, back-color-1(), back-color-2())
+  background-image: radial-gradient(ellipse 200% 100% at 50% 100%, back-color-1(), back-color-2())
   background-attachment: fixed
   font-family: sans-serif
-  color: fore-color
+  color: fore-color()
   text-shadow: 1px 1px 3px rgba(0,0,0,0.5)
 
 .chat-window
@@ -21,14 +28,38 @@ html
   width: 480px
   height: 640px
   padding: 0px
-  border: solid 2px fore-color
+  border: solid 2px fore-color(0.3)
 
-  .message
+  .messages
+    line-height: 28px
+    font-size: 20px
+    //bottom: 0px
+    
+    .message
+      box-sizing: border-box   
+      display: block
+      width: 100%
+      padding: 0px 4px
+      margin: 0px
+      background: back-color-2(0.1)
+      color: fore-color()
+      
+
+  input.send-message
     position: absolute
+    box-sizing: border-box   
     display: block
     bottom: 0px
     width: 100%
-    padding: 0px
+    padding: 0px 4px
     margin: 0px
-    box-sizing: border-box
+    height: 28px
+    background: back-color-2(0.5)
+    border: none
+    border-top: solid 2px fore-color(0.3)
+    line-height: 28px
+    font-size: 20px
+    color: fore-color()
+
+
 

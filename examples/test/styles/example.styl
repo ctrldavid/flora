@@ -1,18 +1,24 @@
 // Dark
-fore-color = rgba(168,168,168,1.0)
-back-color-1 = rgba(27,27,32,1.0)
-back-color-2 = rgba(64,64,64,1.0)
+fore-color(alpha=1.0)
+  rgba(168,168,168,alpha)
+back-color-1(alpha=1.0)
+  rgba(27,27,32,alpha)
+back-color-2(alpha=1.0)
+  rgba(64,64,64,alpha)
 
-color-1 = rgba(64,168,64,1.0)
-color-2 = rgba(192,64,64,1.0)
+color-1(alpha=1.0)
+  rgba(64,168,64,alpha)
+color-2(alpha=1.0)
+  rgba(192,64,64,alpha)
+
 
 
 html
   height: 100%
-  background-image: url('../images/dirt.png'), radial-gradient(ellipse 200% 100% at 50% 100%, back-color-1, back-color-2)
+  background-image: url('../images/dirt.png'), radial-gradient(ellipse 200% 100% at 50% 100%, back-color-1(), back-color-2())
   background-attachment: fixed
   font-family: sans-serif
-  color: fore-color
+  color: fore-color()
   text-shadow: 1px 1px 3px rgba(0,0,0,0.5)
 
 .console
@@ -21,7 +27,7 @@ html
   max-width: 640px  
   width: 90%
   margin: 5% auto
-  border: solid 2px fore-color
+  border: solid 2px fore-color()
   border-radius: 4px
   box-shadow: 2px 2px 12px rgba(0,0,0,0.5)
   background-color: rgba(0,0,0,0.2)
@@ -40,7 +46,7 @@ html
   .form
     position: relative
     display: block
-    border: solid fore-color 1px
+    border: solid fore-color() 1px
     border-radius: 3px
     width: 90%
     margin: 0px auto
@@ -58,7 +64,7 @@ html
         border: none
         background-color: rgba(0,0,0,0.8)
         text-align: left
-        color: fore-color
+        color: fore-color()
 
       .channel
         position: absolute
@@ -94,9 +100,9 @@ html
   font-family: monospace
 
   .frame.to
-    color: color-2
+    color: color-2()
   .frame.from
-    color: color-1
+    color: color-1()
 
 .debug
   position: fixed

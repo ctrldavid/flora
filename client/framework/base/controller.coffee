@@ -76,10 +76,15 @@ define [
           dfd.resolve()
       dfd.promise()
 
+  StemSingleton = new Stem
+  StemSingleton.initialise()
+
   class Controller extends Events
     constructor: ->
       super
       @_waits = []
+      # Just start right away.
+      controllerMethods.init this
 
     # Helper method for turning an event into a deferred that can be waited on.
     eventDeferred: (evt) ->
@@ -92,5 +97,9 @@ define [
 
     command: (str, obj) ->
       [channel, command] = str.split " "
+
+    send: (command, data, id) ->
+      StemSingleton.send {@channel, command, id, data}
+      console.log {@channel, command, data}
 
   return Controller

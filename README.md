@@ -20,3 +20,15 @@ ln -s ~/tmp/redis-2.6.13/src/redis-server /usr/local/bin/redis-server
 ln -s ~/tmp/redis-2.6.13/src/redis-cli /usr/local/bin/redis-cli
 ln -s ~/tmp/redis-2.6.13/src/redis-benchmark /usr/local/bin/redis-benchmark
 
+
+
+ZMQ stuff
+---------
+zmq bindings for node are old, don't support v4.
+wget http://download.zeromq.org/zeromq-3.2.4.tar.gz
+apt-get install libtool autoconf automake uuid-dev
+
+# go into the dir.
+./configure
+make install
+ldconfig
