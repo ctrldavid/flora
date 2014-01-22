@@ -4,7 +4,10 @@ ws = require 'ws'
 
 session = require './modules/simple_sessions/simple_sessions'
 
+zmq = require 'zmq'
 
+pub = zmq.socket 'pub'
+pub.bindSync 'tcp://127.0.0.1:8000'
 
 sessions = {}
 handlers = {}
@@ -59,6 +62,7 @@ class Client
       message = JSON.parse msg
       console.log "#{ts()} #{@pretty()} on [#{message.channel}] with id [#{message.id}]: [#{message.command}]. data:#{JSON.stringify(message.data)}"
       handlers[message.channel]?.commands?[message.command]?.apply(handlers[message.channel], [message, this])
+      pub.send ["#{message.channel}", "#{message.command}", "#{message.id}", "#{@session.id}", "#{JSON.stringify(message.data)}"]
 
     @socket.on 'close', () =>
       console.log "#{ts()} Disconnect from #{@pretty()}.",arguments
@@ -66,11 +70,26 @@ class Client
   pretty: -> @colour @session.id.match(/^.{8}/)[0]
 
   send: (msg) ->
-    @socket.send JSON.stringify msg
+    try 
+      @socket.send JSON.stringify msg
+    catch error
+      console.log 'shit son it is closed'
+      
+    
 
+clients = {}
 server = new ws.Server port: 5000
 server.on 'connection', (socket) ->
   c = new Client socket
+  clients[c.session.id] = c
+
+
+sub = zmq.socket 'sub'
+sub.connect 'tcp://127.0.0.1:8001'
+sub.subscribe ''
+sub.on 'message', (channel, command, id, connectionid, data) ->
+  console.log "ZMQ: #{channel}:#{command} -> #{connectionid}"
+  clients[connectionid.toString()]?.send {channel:channel.toString(), command:command.toString(), id:id.toString(), data:data.toString()}
 
 console.log 'Server started.'
 

@@ -25,15 +25,22 @@ define [
       return if @_initialised
       @ws = new window.WebSocket "ws://#{url}:#{port}/"
       @ws.onmessage = @receive
+
       @_initialised = true
+      @_ready = false
+      @ws.onopen = =>
+        @_ready = true
+        @trigger 'ready'
+
 
     receive: (message) =>
+      console.log 'message', message
       data = JSON.parse message.data
       @trigger 'receive', data
       if data.channel?
         if data.command?
           for listener in @listeners[data.channel]
-            listener.handlers[data.command]?.apply listener, [data.id, data.data]
+            listener.commands[data.command]?.apply listener, [JSON.parse(data.data)]
         @trigger "receive-#{data.channel}", data
     send: (frame) ->
       @ws.send JSON.stringify frame
@@ -83,8 +90,16 @@ define [
     constructor: ->
       super
       @_waits = []
-      # Just start right away.
-      controllerMethods.init this
+      
+      # Start when the websocket connection is ready
+      ready = =>
+        StemSingleton.registerChannel @channel, this
+        controllerMethods.init(this)
+
+      if StemSingleton._ready
+        setTimeout ready, 0
+      else
+        StemSingleton.on 'ready', ready
 
     # Helper method for turning an event into a deferred that can be waited on.
     eventDeferred: (evt) ->

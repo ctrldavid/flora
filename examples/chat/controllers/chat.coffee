@@ -5,17 +5,20 @@ define [
   class ChatController extends Controller
     channel: 'chat'
     commands:
-      message: (cmd) ->
-        console.log "Chat controller got message from #{cmd.sender}: #{cmd.text}"
-        @emit 'message', {text: cmd.text}
+      message: (data) ->
+        console.log "Chat controller got message", data
+        @trigger 'message', {text: data.message}
 
     init: ->
       @history = []
       @idctr = 0
 
     sendMessage: (text) ->
-      @send 'message', {text, from:'me', to:'you'}, @idctr++
-      @trigger 'message', {text, from:'me', to:'you'}
+      @send 'message', {text, channel:'global'}, @idctr++
+      # @trigger 'message', {text, channel: 'global'}
+
+    subscribe: (channel) ->
+      @send 'subscribe', {channel}, @idctr++
 
       
 

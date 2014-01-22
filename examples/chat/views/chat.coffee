@@ -14,6 +14,8 @@ define [
       window.CC = @ChatController
       @ChatController.on 'message', @addMessage
 
+      @ChatController.once 'loaded', => @ChatController.subscribe 'global'
+
     send: ->
       text = @$('.js-send-message').val()
       @$('.js-send-message').val ''
@@ -22,6 +24,7 @@ define [
     addMessage: (msg) =>
       message = $("<div></div>").addClass("message").text(msg.text);
       @$('.messages').append message
+      @$('.messages').scrollTop @$('.messages').height()
 
 
 

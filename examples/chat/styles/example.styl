@@ -23,17 +23,28 @@ html
   text-shadow: 1px 1px 3px rgba(0,0,0,0.5)
 
 .chat-window
-  position: relative
-  margin: 40px auto 0px auto
-  width: 480px
-  height: 640px
+  position: absolute
+  // overflow: hidden
+  // margin: 40px auto 0px auto
+  margin: auto
+  left: 20px
+  right: 20px
+  top: 20px
+  bottom: 20px
+  max-width: 480px
+  max-height: 640px
   padding: 0px
   border: solid 2px fore-color(0.3)
 
   .messages
+    position:absolute
     line-height: 28px
     font-size: 20px
-    //bottom: 0px
+    top: 0px
+    left: 0px
+    right: 0px
+    bottom: 30px
+    overflow-y: scroll
     
     .message
       box-sizing: border-box   
