@@ -37,19 +37,21 @@ define [
       console.log 'message', message
       data = JSON.parse message.data
       @trigger 'receive', data
+      console.log @listeners
       if data.channel?
         if data.command?
-          for listener in @listeners[data.channel]
-            listener.commands[data.command]?.apply listener, [JSON.parse(data.data)]
+          for listener in @listeners[data.channel][data.command]
+            listener.channels[data.channel][data.command]?.apply listener, [JSON.parse(data.data)]
         @trigger "receive-#{data.channel}", data
     send: (frame) ->
       @ws.send JSON.stringify frame
       @trigger 'send', frame
 
-    registerChannel: (channel, listener) ->
-      @listeners[channel] ?= []
-      @listeners[channel].push listener
-      console.log "Added listener to #{channel}", listener
+    registerHandler: (channel, command, controller) ->
+      console.log 'Registering handler', channel, command, controller
+      @listeners[channel] ?= {}
+      @listeners[channel][command] ?= []
+      @listeners[channel][command].push controller
 
 
   controllerMethods =
@@ -83,6 +85,7 @@ define [
           dfd.resolve()
       dfd.promise()
 
+
   StemSingleton = new Stem
   StemSingleton.initialise()
 
@@ -93,7 +96,9 @@ define [
       
       # Start when the websocket connection is ready
       ready = =>
-        StemSingleton.registerChannel @channel, this
+        # Loop through the list of handlers on the controller and set them up to receive messages.
+        StemSingleton.registerHandler channel, command, this for command of @channels[channel] for channel of @channels
+
         controllerMethods.init(this)
 
       if StemSingleton._ready
@@ -113,8 +118,8 @@ define [
     command: (str, obj) ->
       [channel, command] = str.split " "
 
-    send: (command, data, id) ->
-      StemSingleton.send {@channel, command, id, data}
-      console.log {@channel, command, data}
+    send: (channel, command, data, id) ->
+      StemSingleton.send {channel, command, id, data}
+      console.log {channel, command, data}
 
   return Controller
