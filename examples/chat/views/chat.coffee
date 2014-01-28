@@ -22,7 +22,11 @@ define [
       @ChatController.sendMessage text
 
     addMessage: (msg) =>
-      message = $("<div></div>").addClass("message").text(msg.text);
+      message = $("<div></div>").addClass("message")
+      sender = $("<span></span>").text("#{msg.sender.substring(0,4)}: ")
+      text = $("<span></span>").text(msg.text)
+      message.append sender
+      message.append text
       @$('.messages').append message
       @$('.messages').scrollTop @$('.messages').height()
 

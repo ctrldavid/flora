@@ -7,7 +7,7 @@ define [
     commands:
       message: (data) ->
         console.log "Chat controller got message", data
-        @trigger 'message', {text: data.message}
+        @trigger 'message', {text: data.message, sender: data.sender}
 
     init: ->
       @history = []
