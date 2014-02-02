@@ -34,10 +34,10 @@ define [
 
 
     receive: (message) =>
-      console.log 'message', message
+      # console.log 'message', message
       data = JSON.parse message.data
       @trigger 'receive', data
-      console.log @listeners
+      # console.log @listeners
       if data.channel?
         if data.command?
           for listener in @listeners[data.channel][data.command]
@@ -48,7 +48,7 @@ define [
       @trigger 'send', frame
 
     registerHandler: (channel, command, controller) ->
-      console.log 'Registering handler', channel, command, controller
+      # console.log 'Registering handler', channel, command, controller
       @listeners[channel] ?= {}
       @listeners[channel][command] ?= []
       @listeners[channel][command].push controller
@@ -120,6 +120,6 @@ define [
 
     send: (channel, command, data, id) ->
       StemSingleton.send {channel, command, id, data}
-      console.log {channel, command, data}
+      # console.log {channel, command, data}
 
   return Controller

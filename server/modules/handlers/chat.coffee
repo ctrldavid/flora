@@ -4,12 +4,18 @@
 class ChatChannel
   constructor: ({@id, @name, @controller}) ->
     @users = []
+    @history = []
 
   send: (message) ->
+    @history.push {message:message.data.text, channel:@id, sender:message.connectionid}
+    @history = @history.slice -100 # Only store the last x messages in history
     for user in @users
       console.log "Fan out to #{user}"#, message
       @controller.send {command: 'message', id:undefined, connectionid:user, data:{message:message.data.text, channel:@id, sender:message.connectionid}}
       #controller.send new Message 'chat', {channel: @id, @name, text:msg}
+
+  sendHistory: (user) ->
+    @controller.send {command: 'history', id:undefined, connectionid:user, data:{messages:@history}}
 
   addUser: (id) ->
     @users.push id
@@ -23,6 +29,8 @@ class ChatHandler extends Controller
       #sender.send new Message 'echo', {data: data.data}
       @channels[message.data.channel] ?= new ChatChannel {id:message.data.channel, name:message.data.channel, controller:this}
       @channels[message.data.channel].addUser message.connectionid
+      @channels[message.data.channel].sendHistory message.connectionid
+
     message: (message) ->
       console.log "#{message.connectionid} sent a message to #{message.data.channel}"
       @channels[message.data.channel]?.send message
