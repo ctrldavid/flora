@@ -22,7 +22,7 @@ class ChatChannel
     @clients.push client
 
 # Chat module
-class ChatHandler extends Controller
+class ChatController extends Controller
   constructor : ->
     super
     @on 'client', 'sharded', 'chat', 'subscribe', (client, message) ->
@@ -40,6 +40,4 @@ class ChatHandler extends Controller
   init: ->
     @channels = {}
 
-x = new ChatHandler
-
-exports.ChatHandler = ChatHandler
+exports.ChatController = ChatController

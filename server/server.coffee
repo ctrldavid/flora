@@ -1,16 +1,13 @@
 ws = require 'ws'
-{EchoHandler} = require './modules/handlers/echo'
-{Message} = require './modules/message'
 
-session = require './modules/simple_sessions/simple_sessions'
+uuid = require 'node-uuid'
 
 zmq = require 'zmq'
 
 pub = zmq.socket 'pub'
 pub.connect 'tcp://127.0.0.1:6500'
 
-sessions = {}
-handlers = {}
+
 
 ANSI =
   black: '\x1B[31;0m'
@@ -22,20 +19,7 @@ ANSI =
   colour: (r,g,b) -> (str) -> ANSI.rgb(r, g, b) + str + ANSI.reset
   randomColour: () -> ANSI.colour Math.random()*6|0, Math.random()*6|0, Math.random()*6|0
 
-class RedisHandler
-  constructor: () ->
-    @paths = {}
-  commands:
-    'subscribe': (message, sender) ->
-      @paths[message.id] ?= []
-      @paths[message.id].push sender
-      sender.send {channel: 'redis', command: 'info', reply: message.reply, message: "Successfully subscribed to redis object #{message.id}"}
-    'set': (message, sender) ->
-      for subscriber in @paths[message.id]
-        subscriber.send {channel: 'redis', command: 'set', id: message.id, data:{key: message.data.key, value: message.data.value}}
 
-handlers['echo'] = new EchoHandler
-handlers['redis'] = new RedisHandler
 
 pad = (s, n=2) ->
   s = s.toString()
@@ -52,16 +36,13 @@ ts = timestamp = () ->
 class Client
   constructor: (@socket) ->
     @ip = @socket._socket.remoteAddress
-    @session = new session.Session @ip
+    @session = {id:uuid.v4()}
     @colour = ANSI.randomColour()
     console.log "#{ts()} New connection with IP #{@ip} and session #{@colour @session.id}"
-
-    @send new Message 'auth', {id: @session.id}
 
     @socket.on 'message', (msg) =>
       message = JSON.parse msg
       console.log "#{ts()} #{@pretty()} on [#{message.channel}] with id [#{message.id}]: [#{message.command}]. data:#{JSON.stringify(message.data)}"
-      handlers[message.channel]?.commands?[message.command]?.apply(handlers[message.channel], [message, this])
       pub.send ["#{message.channel}", "#{message.command}", "#{message.id}", "#{@session.id}", "#{JSON.stringify(message.data)}"]
 
     @socket.on 'close', () =>

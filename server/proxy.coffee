@@ -8,11 +8,13 @@ proxy = (pubAddr, subAddr) ->
   xsub.bindSync subAddr
 
   xsub.on 'message', -> 
-    console.log "#{subAddr} -> #{pubAddr}"
-    xpub.send Array.prototype.slice.call arguments
+    arr = Array.prototype.slice.call arguments
+    console.log "#{subAddr} -> #{pubAddr}: #{JSON.stringify arr.map (x)->x.toString()}"
+    xpub.send arr
   xpub.on 'message', -> 
-    console.log "#{pubAddr} -> #{subAddr}"
-    xsub.send Array.prototype.slice.call arguments
+    arr = Array.prototype.slice.call arguments
+    console.log "#{pubAddr} -> #{subAddr}: #{JSON.stringify arr.map (x)->x.toString()}"
+    xsub.send arr
 
 # Server to server communication goes over this pair:
 console.log 'Starting SS Proxy. XPUB:8000, XSUB:8500'
