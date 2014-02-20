@@ -7,7 +7,7 @@ session = require './modules/simple_sessions/simple_sessions'
 zmq = require 'zmq'
 
 pub = zmq.socket 'pub'
-pub.bindSync 'tcp://127.0.0.1:8000'
+pub.connect 'tcp://127.0.0.1:6500'
 
 sessions = {}
 handlers = {}
@@ -85,7 +85,7 @@ server.on 'connection', (socket) ->
 
 
 sub = zmq.socket 'sub'
-sub.connect 'tcp://127.0.0.1:8001'
+sub.connect 'tcp://127.0.0.1:7000'
 sub.subscribe ''
 sub.on 'message', (channel, command, id, connectionid, data) ->
   console.log "ZMQ: #{channel}:#{command} -> #{connectionid}"

@@ -15,7 +15,7 @@ require.config
   paths:
     underscore: 'vendor/underscore'
     backbone: 'vendor/backbone'
-    $: 'vendor/jquery'
+    $: 'vendor/jquery-2.1.0.min'
     moment: 'vendor/moment'
     
     view: 'base/view'

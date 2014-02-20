@@ -2,8 +2,9 @@ define [
   '$'
   'view'
   'controllers/chat'
+  'controllers/auth'
   'templates/chat/main'
-], ($, View, {ChatController}, mainT) ->
+], ($, View, {ChatController}, {AuthController}, mainT) ->
   class ChatView extends View
     template: mainT
     events:
@@ -11,10 +12,12 @@ define [
 
     init: ->
       @ChatController = new ChatController
+      @AuthController = new AuthController
       window.CC = @ChatController
       @ChatController.on 'message', @addMessage
 
       @ChatController.once 'loaded', => @ChatController.subscribe 'global'
+      @AuthController.once 'loaded', => @AuthController.go()
 
     send: ->
       text = @$('.js-send-message').val()
