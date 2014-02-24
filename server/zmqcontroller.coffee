@@ -1,3 +1,18 @@
+###
+  wat to dooooo.....
+  Maybe websocket endpoints should be controllers? do away with the CS/SC/SS bs?
+
+  How to do handlers... string parsing?
+  general form: "channel:shard/command/subcommand/blar"
+  or without sharding: "channel/command"
+  "ws:channel/command"
+  "chat:room/command"
+
+
+
+###
+
+
 zmq = require 'zmq'
 
 class Controller
@@ -18,7 +33,7 @@ class Controller
     @_handlers = {}
 
     @clientSub.on 'message', (channel, command, msgid, connectionid, data) =>
-      # console.log "Controller- #{msgid} from #{connectionid} on channel #{channel}. Command:#{command}. Data:#{data}"      
+      console.log "Controller- #{msgid} from #{connectionid} on channel #{channel}. Command:#{command}. Data:#{data}"      
       message = {
         channel: "#{channel}",
         command: "#{command}",
@@ -27,18 +42,26 @@ class Controller
         data: JSON.parse "#{data}"
       }
 
-      clientID = connectionid.toString()
-      client = {
-        id: clientID
-        send: (channel, message) =>
-          @clientPub.send ["#{channel}", "#{message.command}", "#{message.id}", "#{clientID}", "#{JSON.stringify(message.data)}"]
-      }
 
-      #@commands[command]?.apply this, [message]
-      if @_handlers[channel]? && @_handlers[channel][command]
-        for fnc in @_handlers[channel][command]
-          fnc.apply this, [client, message]
+      # Pass the request through our middleware layers
+      index = 0
+      next = =>
+        console.log "Index: #{index}, length: #{@middleware.length}"
+        console.log @middleware[index]
+        if index < @middleware.length
+          console.log 'GOING BRAH'
+          @middleware[index++](message, next)
+        else
+          done()
 
+      # Handle the request
+      done = =>
+        if @_handlers[channel]? && @_handlers[channel][command]
+          for fnc in @_handlers[channel][command]
+            fnc.apply this, [message]
+
+      # Start the process
+      next()
 
     @init()
 
