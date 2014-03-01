@@ -1,83 +1,50 @@
-// Dark
-fore-color(alpha=1.0)
-  rgba(168,168,168,alpha)
-back-color-1(alpha=1.0)
-  rgba(27,27,32,alpha)
-back-color-2(alpha=1.0)
-  rgba(64,64,64,alpha)
-
-color-1(alpha=1.0)
-  rgba(64,168,64,alpha)
-color-2(alpha=1.0)
-  rgba(192,64,64,alpha)
-
-// @font-face 
-//   font-family: 'VT323'
-//   font-style: normal
-//   font-weight: 400
-//   src: local('VT323'), local('VT323-Regular'), url(http://themes.googleusercontent.com/static/fonts/vt323/v5/LfMzj2MWAZU6qzlnp1MNbg.woff) format('woff')
-
-
 html
-  height: 100%
-  //background-image: url('../images/dirt.png'), radial-gradient(ellipse 200% 100% at 50% 100%, back-color-1(), back-color-2())
-  background-image: radial-gradient(ellipse 200% 100% at 50% 100%, back-color-1(), back-color-2())
-  background-attachment: fixed
-  font-family: sans-serif
-  color: fore-color()
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.5)
+  background-color: rgba(255,255,255,1.0)
+body
+  //padding-top: 70px // Move content down below the fixed header
+
+.navbar
+  margin-bottom: 0px
+
+  .nickname
+    margin: 10px
+
+.content
+  position: absolute
+  top: 50px
+  left: 0px
+  right: 0px
+  bottom: 0px
+
 
 .chat-window
   position: absolute
-  // overflow: hidden
-  // margin: 40px auto 0px auto
-  margin: auto
-  left: 10px
-  right: 10px
-  top: 10px
-  bottom: 10px
-  max-width: 480px
-  max-height: 640px
-  padding: 0px
-  border: solid 2px fore-color(0.3)
-  // box-shadow: 0px 0px 8px fore-color(0.5)
+  margin: 0px auto 0px auto
+  padding: 10px
+  top: 0
+  left: 0
+  right: 0
+  bottom: 0
+  max-width: 720px
+
 
   .messages
-    position:absolute
-    line-height: 28px
-    font-size: 20px
-    top: 0px
-    left: 0px
-    right: 0px
-    bottom: 30px
     overflow-y: scroll
+
+  .panel
+    position: relative
+    height: 100%
+    margin-bottom: 0px
     
-    .message
-      // font-family: 'VT323', monospace
-      box-sizing: border-box   
-      display: block
-      width: 100%
-      padding: 0px 4px
-      margin: 0px
-      background: back-color-2(0.1)
-      color: fore-color()
+    .panel-body
+      position: absolute
+      top: 0px
+      bottom:  50px
+      right:  0px
+      left:  0px
       
-
-  input.send-message
-    position: absolute
-    box-sizing: border-box   
-    display: block
-    bottom: 0px
-    width: 100%
-    padding: 0px 4px
-    margin: 0px
-    height: 28px
-    background: back-color-2(0.5)
-    border: none
-    border-top: solid 2px fore-color(0.3)
-    line-height: 28px
-    font-size: 20px
-    color: fore-color()
-
-
-
+    .panel-footer
+      position: absolute
+      bottom:  0px
+      right:  0px
+      left:  0px

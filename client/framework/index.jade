@@ -4,6 +4,31 @@ html(xmlns="http://www.w3.org/1999/xhtml")
   head
     meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0")
     title flora
+    script
+      (function(){
+        var orig = {};
+        for (var attr in window){
+          orig[attr] = window[attr];
+        }
+        var check = function(){
+          for (var attr in window){
+            if (attr in orig){
+              if (orig[attr] != window[attr]){
+                // console.warn("window." + attr + " has changed value");
+              }
+            } else {
+              if (window[attr] === undefined){
+                console.warn("New global: " + attr + " (although value is undefined)");
+              } else {
+                console.warn("New global: " + attr);
+              }
+
+            }
+            orig[attr] = window[attr];
+          }
+        };
+        window.setInterval(check, 100);
+      }())
     script(src="/vendor/require.min.js", data-main="flora")
     link(href="flora.css", rel="stylesheet")
   body

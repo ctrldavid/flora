@@ -6,7 +6,9 @@ define [
     channels: 
       auth:
         confirm: (data) ->
-          alert JSON.stringify data
+          console.log data
+        name: (data) ->
+          console.log 'You have a new name', data
 
     init: ->
       @idctr = 0
@@ -14,12 +16,9 @@ define [
     go: ->
       @send 'auth', 'request', {}
 
-    sendMessage: (text) ->
-      @send 'chat', 'message', {text, channel:'global'}, @idctr++
+    changeName: (name) ->
+      @send 'auth', 'rename', {name}, @idctr++
       # @trigger 'message', {text, channel: 'global'}
-
-    subscribe: (channel) ->
-      @send 'chat', 'subscribe', {channel}, @idctr++
 
       
 

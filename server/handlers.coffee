@@ -1,3 +1,5 @@
 {ChatController} = require './controllers/chat'
+{AuthController} = require './controllers/auth'
 
-x = new ChatController()
+new ChatController()
+new AuthController()

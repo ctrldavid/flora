@@ -17,6 +17,7 @@ zmq = require 'zmq'
 
 class Controller
   constructor: ->
+    @middleware ?= []
     @clientSub = zmq.socket 'sub'
     @clientSub.connect 'tcp://127.0.0.1:6000'
     
@@ -50,7 +51,7 @@ class Controller
         console.log @middleware[index]
         if index < @middleware.length
           console.log 'GOING BRAH'
-          @middleware[index++](message, next)
+          @middleware[index++].apply this, [message, next]
         else
           done()
 

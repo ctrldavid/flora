@@ -1,6 +1,8 @@
 {Controller} = require '../zmqcontroller'
 {Message} = require '../message'
 {Reply} = require '../middleware/reply'
+{Auth} = require '../middleware/auth'
+
 
 ###
   It would be nice to have middleware layers that controllers can use.
@@ -18,11 +20,11 @@ class ChatChannel
     @history = []
 
   send: (message) ->
-    @history.push {message:message.data.text, channel:@id, sender:message.connectionid}
+    @history.push {message:message.data.text, channel:@id, sender:message.Auth.name}
     @history = @history.slice -100 # Only store the last x messages in history
     for client in @clients
       console.log "Fan out to #{client.id}"#, message
-      client.send 'chat', {command: 'message', id:undefined, data:{message:message.data.text, channel:@id, sender:message.connectionid}}
+      client.send 'chat', {command: 'message', id:undefined, data:{message:message.data.text, channel:@id, sender:message.Auth.name}}
       #@controller.send 'chat', {command: 'message', id:undefined, connectionid:user, data:{message:message.data.text, channel:@id, sender:message.connectionid}}
       #controller.send new Message 'chat', {channel: @id, @name, text:msg}
 
@@ -34,7 +36,7 @@ class ChatChannel
 
 # Chat module
 class ChatController extends Controller
-  middleware: [Reply]
+  middleware: [Reply, Auth]
   constructor : ->
     super
     @on 'client', 'sharded', 'chat', 'subscribe', (message) ->
@@ -46,7 +48,7 @@ class ChatController extends Controller
 
     @on 'client', 'unsharded', 'chat', 'message', (message) ->
       console.log "#{message.connectionid} sent a message to #{message.data.channel}"
-      console.log "Pants: #{message.pants}"
+      console.log "Auth: #{JSON.stringify message.Auth}"
       @channels[message.data.channel]?.send message
 
 
