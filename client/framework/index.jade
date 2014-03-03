@@ -28,7 +28,24 @@ html(xmlns="http://www.w3.org/1999/xhtml")
           }
         };
         window.setInterval(check, 100);
-      }())
+      }());
+    script
+      (function(){
+        window.onerror = function(err, url, line){
+          console.log("Error", arguments);
+          var req = new XMLHttpRequest();
+          req.open("POST", "http://rest.zk.io/flora/errors/");
+          req.setRequestHeader("Content-Type", "application/json");
+          var report = {
+            error: err,
+            url: url,
+            line: line,
+            localTime: (new Date).toUTCString()
+          };
+          req.send(JSON.stringify(report));
+
+        };
+      }());
     script(src="/vendor/require.min.js", data-main="flora")
     link(href="flora.css", rel="stylesheet")
   body

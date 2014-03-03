@@ -24,12 +24,15 @@ define [
       text = @$('.js-send-message').val()
       @$('.js-send-message').val ''
       @chatController.sendMessage text
+      # throw new Error "AIE  #{text}"
 
     addMessage: (msg) =>
       messageView = new MessageView {model:msg}
       @append('.messages', messageView).then =>
         window.view = messageView
         @$('.messages').scrollTop messageView.el.offsetTop
+
+      
 
 
 
