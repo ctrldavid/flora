@@ -18,13 +18,13 @@ client.select 1, () ->
   console.log 'gyar... fibres?'
 
 exports.Auth = (message, next) ->
-  console.log 'IN AUTH MIDDLEWARE'
+  # console.log 'IN AUTH MIDDLEWARE'
   connectionID = message.connectionid.toString()
 
   client.hget 'auth/c2u', connectionID, (err, userID) ->
-    console.log 'got userID:', userID
+    # console.log 'got userID:', userID
     client.hget 'auth/u2n', userID, (err, name) ->
-      console.log 'got name:', name
+      # console.log 'got name:', name
 
       message.Auth = {
         userID
