@@ -69,7 +69,8 @@ class Controller
 
     @serverSub.on 'message', (path, data) =>
       data = JSON.parse "#{data}" # data comes in as a slowbuffer from ZMQ
-      @log "#{@c '~>'} #{@s data.connectionid} #{@c path}. Data:#{@c JSON.stringify data}"
+      #@log "#{@c '->'} #{@s data.connectionid} #{@c path}. Data:#{@c JSON.stringify data}"
+      @log "#{@c '->'} #{@s data.connectionid} #{@c path}."
       if @events?[path]?
         @events[path].apply this, [data]
 
@@ -85,7 +86,8 @@ class Controller
 
 
   send: (path, data) ->
-    @log "#{@c '<~'} #{@c path}. Data:#{@c JSON.stringify(data)}"
+    #@log "#{@c '<-'} #{@c path}. Data:#{@c JSON.stringify(data)}"
+    @log "#{@c '<-'} #{@c path}."
     @serverPub.send ["#{path}", "#{JSON.stringify(data)}"]
 
   # Static helper method for attaching middleware to handlers.
@@ -116,7 +118,10 @@ class Controller
         handle.apply this, [message, fn]
         
   log: (msg) ->
-    console.log "#{ts()} #{@c @constructor.name}: #{msg}"
+    title = @constructor.name
+    title = ' ' + title while title.length < 20
+
+    console.log "#{ts()} #{@c title}: #{msg}"
 
   c: (msg) ->
     msg ?= '^^^^^^'

@@ -31,19 +31,27 @@ class ChatChannel
   addClient: (client) ->
     @clients.push client
 
+  removeClient: (id) ->
+    @clients = @clients.filter (client) -> id != client.connectionid
+
+
 # Chat module
 class ChatController extends Controller
   events:
     'ws/chat/subscribe': @middleware([Reply]) (message) ->
-      @log "#{@c message.connectionid} subscribed to #{@c message.data.channel}"
+      @log "#{@s message.connectionid} subscribed to #{@c message.data.channel}"
       @channels[message.data.channel] ?= new ChatChannel {id:message.data.channel, name:message.data.channel, controller:this}
       @channels[message.data.channel].addClient message.reply
       @channels[message.data.channel].sendHistory message.reply
 
     'ws/chat/message': @middleware([Auth]) (message) ->
-      @log "#{@s message.connectionid} sent a message to #{@c message.data.channel}"
-      @log "Auth: #{JSON.stringify message.Auth}"
+      @log "#{@s message.Auth.name or message.connectionid} sent a message to #{@c message.data.channel}"
+      #@log "Auth: #{JSON.stringify message.Auth}"
       @channels[message.data.channel]?.send message
+
+    'ws/disconnect': (message) ->
+      @log "Removing #{@s message.connectionid}"
+      @channels[channelname].removeClient(message.connectionid) for channelname of @channels
 
 
   init: ->

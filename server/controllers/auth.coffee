@@ -25,6 +25,7 @@ class AuthController extends Controller
 
     'ws/auth/rename': @middleware([Reply, Auth]) (message) ->
       client.hset 'auth/u2n', message.Auth.userID, message.data.name, (err) ->
+      @log "#{@s message.reply.connectionid} (userid #{@s message.Auth.userID}) now known as #{@c message.data.name}"
       message.reply.send 'auth', {command: 'name', id:undefined, data:{userID: message.userID, name: message.data.name}}
 
 

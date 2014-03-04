@@ -13,7 +13,9 @@ class Client
     
     #console.log "#{ts()} New connection with IP #{@ip} and session #{@colour @session.id}"
     @socket.on 'close', () =>
-      @controller.log "Websocket close event"
+      @controller.log "Websocket close event from #{@controller.s @session.id}"
+      @controller.send "ws/disconnect", {connectionid: @session.id}
+
     @socket.on 'message', (msg) =>
       message = JSON.parse msg
       #console.log "#{ts()} #{@pretty()} on [#{message.channel}] with id [#{message.id}]: [#{message.command}]. data:#{JSON.stringify(message.data)}"
@@ -21,8 +23,6 @@ class Client
       message.connectionid = @session.id
       @controller.send "ws/#{message.channel}/#{message.command}", message
 
-    @socket.on 'close', () =>
-      #console.log "#{ts()} Disconnect from #{@pretty()}.",arguments
 
   send: (msg) ->
     #console.log "Trying to send", msg
@@ -51,7 +51,7 @@ class WebsocketController extends Controller
     @server = new ws.Server port: 5000
     @server.on 'connection', (socket) =>
       c = new Client socket, this
-      @log "new ws connection. giving id #{@c c.session.id}."
+      @log "new ws connection. giving id #{@s c.session.id}."
       @clients[c.session.id] = c
 
     @log 'Server started.'
