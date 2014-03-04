@@ -12,13 +12,14 @@ class Client
     @session = {id:uuid.v4()}
     
     #console.log "#{ts()} New connection with IP #{@ip} and session #{@colour @session.id}"
-
+    @socket.on 'close', () =>
+      @controller.log "Websocket close event"
     @socket.on 'message', (msg) =>
       message = JSON.parse msg
       #console.log "#{ts()} #{@pretty()} on [#{message.channel}] with id [#{message.id}]: [#{message.command}]. data:#{JSON.stringify(message.data)}"
       # pub.send ["#{message.channel}", "#{message.command}", "#{message.id}", "#{@session.id}", "#{JSON.stringify(message.data)}"]
       message.connectionid = @session.id
-      @controller.xsend "ws/#{message.channel}/#{message.command}", message
+      @controller.send "ws/#{message.channel}/#{message.command}", message
 
     @socket.on 'close', () =>
       #console.log "#{ts()} Disconnect from #{@pretty()}.",arguments
@@ -40,7 +41,7 @@ class WebsocketController extends Controller
       command = message.command
       id = message.id
       data = JSON.stringify message.data
-      @log "In theory sending message to #{message.connectionid} on channel #{message.channel}. Command: #{message.command}"
+      # @log "In theory sending message to #{message.connectionid} on channel #{message.channel}. Command: #{message.command}"
       #console.log "ZMQ: #{channel}:#{command} -> #{connectionid}"
       @clients[connectionid]?.send {channel, command, id, data}
 
@@ -52,14 +53,6 @@ class WebsocketController extends Controller
       c = new Client socket, this
       @log "new ws connection. giving id #{@c c.session.id}."
       @clients[c.session.id] = c
-
-
-    # sub = zmq.socket 'sub'
-    # sub.connect 'tcp://127.0.0.1:7000'
-    # sub.subscribe ''
-    # sub.on 'message', (channel, command, id, connectionid, data) ->
-    #   console.log "ZMQ: #{channel}:#{command} -> #{connectionid}"
-    #   clients[connectionid.toString()]?.send {channel:channel.toString(), command:command.toString(), id:id.toString(), data:data.toString()}
 
     @log 'Server started.'
 

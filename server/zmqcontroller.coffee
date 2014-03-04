@@ -60,11 +60,6 @@ ts = timestamp = () ->
 class Controller
   constructor: ->
     @middleware ?= []
-    @clientSub = zmq.socket 'sub'
-    @clientSub.connect 'tcp://127.0.0.1:6000'
-    
-    @clientPub = zmq.socket 'pub'
-    @clientPub.connect 'tcp://127.0.0.1:7500'
 
     @serverSub = zmq.socket 'sub'
     @serverSub.connect 'tcp://127.0.0.1:8000'
@@ -72,73 +67,28 @@ class Controller
     @serverPub = zmq.socket 'pub'
     @serverPub.connect 'tcp://127.0.0.1:8500'
 
-
-    @_handlers = {}
-
-    @clientSub.on 'message', (channel, command, msgid, connectionid, data) =>
-      @log "#{@c '->'} #{@s connectionid} #{@c channel}/#{@c command}. Data:#{@c data}"
-      message = {
-        channel: "#{channel}",
-        command: "#{command}",
-        msgid: "#{msgid}",
-        connectionid: "#{connectionid}",
-        data: JSON.parse "#{data}"
-      }
-
-
-      # Pass the request through our middleware layers
-      index = 0
-      next = =>
-        # console.log "Index: #{index}, length: #{@middleware.length}"
-        # console.log @middleware[index]
-        if index < @middleware.length
-          # console.log 'GOING BRAH'
-          @middleware[index++].apply this, [message, next]
-        else
-          done()
-
-      # Handle the request
-      done = =>
-        if @_handlers[channel]? && @_handlers[channel][command]
-          for fnc in @_handlers[channel][command]
-            fnc.apply this, [message]
-
-      # Start the process
-      next()
-
-
     @serverSub.on 'message', (path, data) =>
-      # @log "looking for #{@c path} in"
-      # console.log @events
+      data = JSON.parse "#{data}" # data comes in as a slowbuffer from ZMQ
+      @log "#{@c '~>'} #{@s data.connectionid} #{@c path}. Data:#{@c JSON.stringify data}"
       if @events?[path]?
-        # @log "Path exists! #{@c path}"
-        @events[path].apply this, [JSON.parse "#{data}"]
+        @events[path].apply this, [data]
 
-    @serverSub.subscribe ''
-
-    @init()
+    # @serverSub.subscribe ''  # Subscribe to everything for testing
+    
+    for path of @events
+      @log "Subscribing to #{@c path}"
+      @serverSub.subscribe path  
+    
+    @log @c 'initialising.'
+    @init?()
     
 
-  on: (network, sharding, channel, command, fnc) ->
-    socket = (if network == 'client' then @clientSub else @serverSub)
-    @log "ZMQ subscribe to #{network} #{channel} #{command}"
-    socket.subscribe channel
-    @_handlers[channel] ?= {}
-    @_handlers[channel][command] ?= []
-    @_handlers[channel][command].push fnc
 
-  xsend: (path, data) ->
-    # @controller.xsend 'ws/send', {channel: 'chat', command: 'message', data:{message:message.data.text, channel:@id, sender:message.Auth.name}}
-    # pos = path.indexOf '/'
-    # channel = path.substr 0, pos   # 0 -> pos
-    # command = path.substr pos + 1  # pos+1 -> end
+  send: (path, data) ->
     @log "#{@c '<~'} #{@c path}. Data:#{@c JSON.stringify(data)}"
     @serverPub.send ["#{path}", "#{JSON.stringify(data)}"]
 
-  send: (channel, message) ->
-    @log "#{@c '<-'} #{@s message.connectionid} #{@c channel}/#{@c message.command}. Data:#{@c JSON.stringify(message.data)}"
-    @serverPub.send ["#{channel}", "#{message.command}", "#{message.id}", "#{message.connectionid}", "#{JSON.stringify(message.data)}"]
-
+  # Static helper method for attaching middleware to handlers.
   @middleware: (arr) ->
     # Pass the request through our middleware layers
     # console.log 'wat wat MW'
@@ -150,8 +100,8 @@ class Controller
         # console.log "Index: #{index}, length: #{arr.length}"
         # console.log arr[index]
         if index < arr.length
-          console.log 'GOING BRAH'
-          console.log JSON.stringify message
+          # console.log 'GOING BRAH'
+          # console.log JSON.stringify message
           arr[index++].apply this, [message, next]
         else
           done.apply this, [message]
@@ -163,7 +113,6 @@ class Controller
       # This function is called in the context of the class
       (message) -> 
         # This function is called in the context of the instance of the class
-        @log @c "MESSAGE"
         handle.apply this, [message, fn]
         
   log: (msg) ->
@@ -174,7 +123,9 @@ class Controller
     msg = msg.toString()
     colourHash[msg] = ANSI.hashColour(msg) unless colourHash[msg]?
     colourHash[msg] msg     
-  s: (msg) -> @c msg.toString().substr(0,8)
+  s: (msg) -> 
+    msg ?= 'vvvvvv'
+    @c msg.toString().substr(0,8)
 
 
 exports.Controller = Controller
