@@ -9,6 +9,12 @@
   "chat:room/command"
 
 
+  What about subcommandy stuff? should it even be allowed?
+  should "ws/send" handle messages to "ws/send/chat"?
+
+  I could just pass it directly... then the : shit won't work...
+
+
 
 ###
 
@@ -100,45 +106,71 @@ class Controller
       # Start the process
       next()
 
+
+    @serverSub.on 'message', (path, data) =>
+      # @log "looking for #{@c path} in"
+      # console.log @events
+      if @events?[path]?
+        # @log "Path exists! #{@c path}"
+        @events[path].apply this, [JSON.parse "#{data}"]
+
+    @serverSub.subscribe ''
+
     @init()
+    
 
   on: (network, sharding, channel, command, fnc) ->
     socket = (if network == 'client' then @clientSub else @serverSub)
+    @log "ZMQ subscribe to #{network} #{channel} #{command}"
     socket.subscribe channel
     @_handlers[channel] ?= {}
     @_handlers[channel][command] ?= []
     @_handlers[channel][command].push fnc
 
-
+  xsend: (path, data) ->
+    # @controller.xsend 'ws/send', {channel: 'chat', command: 'message', data:{message:message.data.text, channel:@id, sender:message.Auth.name}}
+    # pos = path.indexOf '/'
+    # channel = path.substr 0, pos   # 0 -> pos
+    # command = path.substr pos + 1  # pos+1 -> end
+    @log "#{@c '<~'} #{@c path}. Data:#{@c JSON.stringify(data)}"
+    @serverPub.send ["#{path}", "#{JSON.stringify(data)}"]
 
   send: (channel, message) ->
     @log "#{@c '<-'} #{@s message.connectionid} #{@c channel}/#{@c message.command}. Data:#{@c JSON.stringify(message.data)}"
     @serverPub.send ["#{channel}", "#{message.command}", "#{message.id}", "#{message.connectionid}", "#{JSON.stringify(message.data)}"]
 
-  @middleware: (middleware) ->
+  @middleware: (arr) ->
     # Pass the request through our middleware layers
-    handle = (message, fn) =>
+    # console.log 'wat wat MW'
+    handle = (message, done) ->
+      # console.log 'HANDLE'
+
       index = 0
       next = =>
-        console.log "Index: #{index}, length: #{middleware.length}"
-        console.log middleware[index]
-        if index < middleware.length
+        # console.log "Index: #{index}, length: #{arr.length}"
+        # console.log arr[index]
+        if index < arr.length
           console.log 'GOING BRAH'
-          middleware[index++].apply this, [message, next]
+          console.log JSON.stringify message
+          arr[index++].apply this, [message, next]
         else
-          done()
-
-      # Handle the request
-      done = =>
-        fn.apply this, [message]
+          done.apply this, [message]
+      
+      next.apply this, [message, next]
 
 
-    return (fn) => (message) => handle message, fn
+    return (fn) -> 
+      # This function is called in the context of the class
+      (message) -> 
+        # This function is called in the context of the instance of the class
+        @log @c "MESSAGE"
+        handle.apply this, [message, fn]
         
   log: (msg) ->
     console.log "#{ts()} #{@c @constructor.name}: #{msg}"
 
   c: (msg) ->
+    msg ?= '^^^^^^'
     msg = msg.toString()
     colourHash[msg] = ANSI.hashColour(msg) unless colourHash[msg]?
     colourHash[msg] msg     

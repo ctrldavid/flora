@@ -43,8 +43,8 @@ class AuthController extends Controller
 
 
   init: ->
-    client.select 1, () ->
-      console.log 'Shit I should wait for this somehow...'
+    client.select 1, () =>
+      @log 'Shit I should wait for this somehow...'
 
     @channels = {}
 
