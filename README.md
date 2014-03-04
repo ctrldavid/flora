@@ -29,9 +29,14 @@ To start a controller run
 
     coffee handler.coffee [path/to/controller] [path/to/othercontroller]...
 
-So atm I run `coffee handler.coffee ./controllers/chat.coffee ./controllers/auth.coffee ./controllers/websocket.coffee`
+
+So atm I run 
+
+    coffee handler.coffee ./controllers/chat.coffee ./controllers/auth.coffee ./controllers/websocket.coffee
+
 
 Shit doesn't work without the proxy set up:
+
     coffee proxy.coffee
 
     
@@ -39,10 +44,10 @@ Shit doesn't work without the proxy set up:
 ZMQ stuff
 ---------
 zmq bindings for node are old, don't support v4.
-wget http://download.zeromq.org/zeromq-3.2.4.tar.gz
-apt-get install libtool autoconf automake uuid-dev
+`wget http://download.zeromq.org/zeromq-3.2.4.tar.gz`
+`apt-get install libtool autoconf automake uuid-dev`
 
-# go into the dir.
-./configure
-make install
-ldconfig
+go into the dir.
+`./configure`
+`make install`
+`ldconfig`
