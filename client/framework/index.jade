@@ -49,10 +49,12 @@ html(xmlns="http://www.w3.org/1999/xhtml")
     script(src="/vendor/require.min.js", data-main="flora")
     link(href="flora.css", rel="stylesheet")
   body
-    #loader
-      div: div F
-      div: div L
-      div: div O
-      div: div R
-      div: div A
-    script document.getElementById('loader').className = 'loader';
+  #loader
+    span loading
+    span.dot='.'
+    span.dot='.'
+    span.dot='.'
+
+    script
+      // document.getElementById('loader').className = 'loader';
+
