@@ -28,7 +28,7 @@ ANSI =
   red:   '\x1B[31;1m'
   rgb: (r, g, b) -> "\x1B[38;5;#{16+r*36+g*6+b}m"
   inc: (n, m=216) -> "\x1B[38;5;#{16+1+0|n*216/m}m"   # 0| floors, n is step along from 0 to m, 216 over m scales it to 216
-  ci: (n) -> ANSI.inc(parseInt(n,10)) + n + ANSI.reset
+  ci: (n, m=216) -> ANSI.inc(parseInt(n,10), m) + n + ANSI.reset
   reset: '\x1B[0m'
   colour: (r,g,b) -> (str) -> ANSI.rgb(r, g, b) + str + ANSI.reset
   randomColour: () -> ANSI.colour Math.random()*6|0, Math.random()*6|0, Math.random()*6|0
@@ -48,9 +48,9 @@ ts = timestamp = () ->
   a = '/'
   b = ' '
   c = ':'
-  ANSI.ci(pad d.getUTCDate()) + a + ANSI.ci(pad d.getUTCMonth()+1) + b +   # Why does getUTCMonth go 0-11? ><
-    ANSI.ci(pad d.getUTCHours()) + c + ANSI.ci(pad d.getUTCMinutes()) +
-    c + ANSI.ci(pad d.getUTCSeconds())
+  ANSI.ci(pad(d.getUTCDate()), 31) + a + ANSI.ci(pad(d.getUTCMonth()+1), 12) + b +   # Why does getUTCMonth go 0-11? ><
+    ANSI.ci(pad(d.getUTCHours()), 24) + c + ANSI.ci(pad(d.getUTCMinutes()), 60) +
+    c + ANSI.ci(pad(d.getUTCSeconds()), 60)
 
 
 
