@@ -32,7 +32,7 @@ require.config
         return ret
 
   map:
-    '*':
+    'backbone':
       jquery: '$'   # Backbone requests 'jquery'. need to give it $ instead.
 
   paths:
