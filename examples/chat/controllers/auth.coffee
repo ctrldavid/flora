@@ -6,9 +6,9 @@ define [
     channels: 
       auth:
         confirm: (data) ->
-          console.log data
+          #console.log data
         name: (data) ->
-          console.log 'You have a new name', data
+          #console.log 'You have a new name', data
 
     init: ->
       @idctr = 0
