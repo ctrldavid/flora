@@ -7,7 +7,7 @@
 class PingController extends Controller
   events: 
     'ws/ping/ping': @middleware([Reply]) (message) ->
-      message.reply.send 'ping', {command: 'pong', id:undefined, data:{ts: (new Date).toUTCString()}}
+      message.reply.send 'ping', {command: 'pong', id:undefined, data:{ts: (new Date).toISOString()}}
 
   init: ->
 

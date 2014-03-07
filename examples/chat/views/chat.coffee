@@ -14,7 +14,7 @@ define [
     init: ->
       @chatController = new ChatController
       @authController = new AuthController
-      window.CC = @chatController
+      
       @chatController.on 'message', @addMessage
 
       @chatController.once 'loaded', => @chatController.subscribe 'global'
@@ -29,7 +29,6 @@ define [
     addMessage: (msg) =>
       messageView = new MessageView {model:msg}
       @append('.messages', messageView).then =>
-        window.view = messageView
         @$('.messages').scrollTop messageView.el.offsetTop
 
       

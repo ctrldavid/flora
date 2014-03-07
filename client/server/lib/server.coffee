@@ -33,7 +33,7 @@ compileTargets =
     'coffee': (data) -> coffee.compile data.toString()
     'jade': (data) ->
       template = jade.compile data.toString(), {pretty: false, client: true, compileDebug: false}
-      return "define(['vendor/jade.runtime'],function(){return #{template};});"
+      return "define(['jade.runtime'],function(jade){return #{template};});"
   'css':
     'css': (data) -> data
     'styl': (data) -> futures.stylusRender(data.toString()).wait()
