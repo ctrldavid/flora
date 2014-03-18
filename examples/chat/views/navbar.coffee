@@ -33,7 +33,7 @@ define [
           ratio = (ping - 50) / (500-50)
           col = "rgba(#{Math.floor(ratio*255)},#{Math.floor((1-ratio)*255)},0,1.0)"
 
-        @$('.js-ping').css {color:col}
+        @$('.js-ping').css {backgroundColor:col}
       
       window.setInterval => 
         @pingController.request()
