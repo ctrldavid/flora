@@ -1,3 +1,2 @@
 *.swp
-client.out
-server.out
+node_modules/*

@@ -8,6 +8,8 @@ nib = require 'nib'
 Future = require 'fibers/future'
 Fiber = require 'fibers'
 
+log = require('./log').bind 'Frontend', 20
+
 futures =
   stat: Future.wrap fs.stat
   isFile: (path) ->
@@ -32,7 +34,7 @@ compileTargets =
     'js': (data) -> data
     'coffee': (data) -> coffee.compile data.toString()
     'jade': (data) ->
-      template = jade.compile data.toString(), {pretty: false, client: true, compileDebug: false}
+      template = jade.compileClient data.toString(), {pretty: false, compileDebug: false}
       return "define(['jade.runtime'],function(jade){return #{template};});"
   'css':
     'css': (data) -> data
@@ -51,7 +53,7 @@ compiledServe = (dirs, exts) ->
         #console.log "Trying #{filePath}"
         continue unless futures.isFile(filePath).wait()
         data = futures.readFile(filePath).wait()
-        console.log "#{type}: #{filename} -> #{filePath}"
+        log "#{type}: #{filename} -> #{filePath}"
         res.contentType type
         res.send handler data
         return
@@ -60,7 +62,7 @@ compiledServe = (dirs, exts) ->
 
 listen = (applicationPath="/", port = 3000) ->
   # This points to the directory this file is in.
-  frameworkPath = path.join __dirname, '../../framework'
+  frameworkPath = path.join __dirname, '../framework'
 
   sourceDirectories = [applicationPath, frameworkPath]  # App files take precedence
 
@@ -79,7 +81,6 @@ listen = (applicationPath="/", port = 3000) ->
   # Images
   app.get /^\/(.*)\.(png|jpg|jpeg|gif)$/, compiledServe sourceDirectories, compileTargets.images
 
-  console.log "\n\n\nServing: ", frameworkPath, applicationPath
   app.get '*', (req, res) ->
     res.render 'index.jade'
 
@@ -87,6 +88,6 @@ listen = (applicationPath="/", port = 3000) ->
 
 
 module.exports.serve = (applicationPath, port) ->
-  console.log "serve #{applicationPath} on #{port}"
+  log "Serving #{applicationPath} on #{port}"
   listen applicationPath, port
 

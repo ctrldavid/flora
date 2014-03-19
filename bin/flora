@@ -3,5 +3,8 @@ var path = require('path');
 var fs = require('fs');
 var lib = path.join(path.dirname(fs.realpathSync(__filename)), '../lib');
 
-require('coffee-script');
+CoffeeScript = require('coffee-script');
+
+CoffeeScript.register(); // New with 1.7.0. Have to explicitly call
+
 require(path.join(lib, 'command')).run();
