@@ -14,7 +14,7 @@ proxy = (pubAddr, subAddr) ->
     #log "#{JSON.stringify arr.map (x)->x.toString()}"
     xpub.send arr
   xpub.on 'message', -> 
-    arr = Array.prototype.slice.call arguments    
+    arr = Array.prototype.slice.call arguments
     log "#{subAddr} <- #{pubAddr}"
     #log "#{JSON.stringify arr.map (x)->x.toString()}"
     xsub.send arr
