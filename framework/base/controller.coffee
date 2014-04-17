@@ -122,4 +122,10 @@ define [
       StemSingleton.send {channel, command, id, data}
       # console.log {channel, command, data}
 
+    # Singleton
+    @instance: ->
+      instance = new this
+      @instance = -> instance
+      instance
+
   return Controller

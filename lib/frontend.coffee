@@ -82,6 +82,7 @@ listen = (applicationPath="/", port = 3000) ->
   app.get /^\/(.*)\.(png|jpg|jpeg|gif)$/, compiledServe sourceDirectories, compileTargets.images
 
   app.get '*', (req, res) ->
+    res.type 'xhtml'
     res.render 'index.jade'
 
   app.listen port

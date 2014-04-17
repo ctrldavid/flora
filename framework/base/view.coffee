@@ -116,9 +116,14 @@ define [
 
     attach: (methods) -> methods.append
 
-    unload: ->
-      @el.remove()
+    detach: ->
+      @$el.detach()
       @_live = false
+
+    # old?
+    # unload: ->
+    #   @el.remove()
+    #   @_live = false
 
     reRender: ->
       # Not sure how this should work, perhaps a full reset, or just start with
