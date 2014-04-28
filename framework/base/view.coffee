@@ -3,6 +3,7 @@ define [
   'backbone'
   '$'
 ], (_, Backbone, $) ->
+
   # Lifecycle goals:
   # init     : Set any fields that have their data already available
   # inited   :
@@ -12,6 +13,44 @@ define [
   # rendered : Entire view and subviews are rendered
   # appear   : View is about to be added to the document
   # appeared : View has just been added to the document
+
+  ###
+  
+  On create:
+  ----------
+
+  init (fn)
+  init... (evt)
+  inited
+
+  load (fn)
+  load... (evt)
+  loaded
+
+  render (fn)
+  render... (evt)
+  rendered
+
+
+  On attach:
+  ----------
+
+  appear (fn)
+  appear... (evt)
+  <- Wait till parent has appeared
+  appeared
+
+
+  On detach:
+  ----------
+
+  disappear (fn)
+  disappear...
+  <- wait till all children have disappeared
+  disappeared
+
+
+  ###
   viewMethods =
     lifecycle: (view, evt) ->
       dfd = $.Deferred()
@@ -37,7 +76,6 @@ define [
       viewMethods.lifecycle(view, 'render').then ->
         view.rendered?()
         view.trigger 'rendered'
-        viewMethods.appear view
 
     appear: (view) ->
       viewMethods.lifecycle(view, 'appear').then ->
@@ -48,7 +86,7 @@ define [
         $.when(view.parent?._live || view.parent?.eventDeferred 'appeared').then ->
           # call view.attach() to get attachment logic.
           # view.parentElement.append view.el
-          view.attach(attachMethods) view
+          attachMethods.append view
           view._live = true
           view.appeared?()
           view.trigger 'appeared'
@@ -75,11 +113,16 @@ define [
     #   console.log 'T2: ', @cid, arguments
     #   super
     constructor: ->
+      # this.on 'all', (evt) ->
+      #  console.log 'EVT', this.constructor.name, evt
       super
       @_waits = []
       @_subviews = []
       @_live = false
       @locals = {}
+
+      # Start loading the page immediately
+      viewMethods.init this
 
     # Helper method for turning an event into a deferred that can be waited on.
     eventDeferred: (evt) ->
@@ -92,11 +135,12 @@ define [
 
     appendTo: (targetElement) ->
       @parentElement = targetElement
-      viewMethods.init this
+      viewMethods.appear this
 
     prepend: (target, view) ->
-      view.attach = (methods) -> methods.prepend
-      @append target, view
+      console.error 'NYI'
+      # view.attach = (methods) -> methods.prepend
+      # @append target, view
 
     append: (target, view) ->
       if typeof target == "string"
@@ -107,23 +151,23 @@ define [
 
       # Return a deferred that resolves when the view renders so the caller
       # can wait on it.
-      dfd = view.eventDeferred 'rendered'
+      dfd = view.eventDeferred 'appeared'
 
-      # Start the loading process
+      # Start the appearing process
       view.appendTo target
 
       return dfd
 
-    attach: (methods) -> methods.append
+    #attach: (methods) -> methods.append
+    attach: ->
+      viewMethods.appear this
 
     detach: ->
       @$el.detach()
+      @parent._subviews = @parent._subviews.filter (view) => view != this
+      @parent = null
       @_live = false
 
-    # old?
-    # unload: ->
-    #   @el.remove()
-    #   @_live = false
 
     reRender: ->
       # Not sure how this should work, perhaps a full reset, or just start with

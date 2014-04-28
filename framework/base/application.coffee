@@ -1,7 +1,8 @@
 define [
+  'backbone'
   '$'
   'view'
-], ($, View) ->
+], (Backbone, $, View) ->
 
   class Application extends View
     start: ->

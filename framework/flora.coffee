@@ -30,7 +30,7 @@ require.config
         ret = jade
         delete window.jade
         return ret
-
+     
   map:
     'backbone':
       jquery: '$'   # Backbone requests 'jquery'. need to give it $ instead.
@@ -42,14 +42,18 @@ require.config
     moment: 'vendor/moment'
     'jade.runtime': 'vendor/jade.runtime'
     
+    promise: 'vendor/promise-0.1.1.min'
+
     view: 'base/view'
     application: 'base/application'
     events: 'base/events'
     controller: 'base/controller'
+    pagesystem: 'base/pagesystem'
 
 
 require [
   'main'
+  'promise' # Shim for ES6 promises.
 ], (Main) ->
   document.getElementById('loader').style.display = 'none'
 
