@@ -10,3 +10,4 @@ exports.load = (Controller) ->
     init: ->
 
   return PingController
+  

@@ -48,6 +48,11 @@ class Controller
     @init?()
     
 
+  deconstruct: ->
+    # @serverSub.disconnect 'tcp://127.0.0.1:8000'
+    # @serverPub.disconnect 'tcp://127.0.0.1:8500'
+    @serverSub.close()
+    @serverPub.close()
 
   send: (path, data) ->
     #@log "#{@c '<-'} #{@c path}. Data:#{@c JSON.stringify(data)}"
