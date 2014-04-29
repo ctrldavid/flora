@@ -18,16 +18,16 @@ module.exports.load = (path) ->
     injected = controller.load Controller, Middleware
     handler = new injected
 
-  kill = ->
-    return unless handler?
-    log "Killing controller: #{path}"
-    handler.deconstruct()
-    handler = null
+  # kill = ->
+  #   return unless handler?
+  #   log "Killing controller: #{path}"
+  #   handler.deconstruct()
+  #   handler = null
 
-  fs.watch path, (event, filename) ->
-    log "Watcher: #{event} on #{filename}"
-    if event == 'change'
-      kill()
-      load()
+  # fs.watch path, (event, filename) ->
+  #   log "Watcher: #{event} on #{filename}"
+  #   if event == 'change'
+  #     kill()
+  #     load()
 
   load()
