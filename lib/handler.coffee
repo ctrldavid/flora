@@ -2,12 +2,20 @@
 log = require('./log').bind 'Handler', 20
 fs = require 'fs'
 
+{Reply} = require '../base/middleware/reply'
+{Auth} = require '../base/middleware/auth'
+
+Middleware = {
+  Reply
+  Auth
+}
+
 module.exports.load = (path) ->
   handler = null
   load = ->
     log "Starting controller: #{path}"
     controller = require path
-    injected = controller.load Controller
+    injected = controller.load Controller, Middleware
     handler = new injected
 
   kill = ->
