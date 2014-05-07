@@ -40,7 +40,7 @@ define [
       # console.log @listeners
       if data.channel?
         if data.command?
-          for listener in @listeners[data.channel][data.command]
+          for listener in @listeners[data.channel]?[data.command]?
             listener.channels[data.channel][data.command]?.apply listener, [JSON.parse(data.data)]
         @trigger "receive-#{data.channel}", data
     send: (frame) ->
