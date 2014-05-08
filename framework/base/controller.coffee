@@ -38,11 +38,11 @@ define [
       data = JSON.parse message.data
       @trigger 'receive', data
       # console.log @listeners
-      if data.channel?
-        if data.command?
-          for listener in @listeners[data.channel]?[data.command]?
-            listener.channels[data.channel][data.command]?.apply listener, [JSON.parse(data.data)]
+      if data.channel? && data.command? && @listeners[data.channel]? && @listeners[data.channel][data.command]?
+        for listener in @listeners[data.channel][data.command]
+          listener.channels[data.channel][data.command]?.apply listener, [JSON.parse(data.data)]
         @trigger "receive-#{data.channel}", data
+
     send: (frame) ->
       @ws.send JSON.stringify frame
       @trigger 'send', frame
