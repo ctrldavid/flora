@@ -50,6 +50,9 @@ define [
       @listeners[channel][command].push controller
 
 
+  promiseError = (error) ->
+    console.error "Error in Controller", error
+
   controllerMethods =
     lifecycle: (controller, evt) ->
       new Promise (resolve, reject) ->
@@ -61,12 +64,14 @@ define [
         controller.inited?()
         controller.trigger 'inited'
         controllerMethods.load controller
+      .catch promiseError
 
     load: (controller) ->
       controllerMethods.lifecycle(controller, 'load').then ->
         controller.loaded?()
         controller.trigger 'loaded'
         # controllerMethods.render controller
+      .catch promiseError
 
     eventLoop: (controller, evt, resolve) ->
       controller.trigger evt
@@ -76,6 +81,7 @@ define [
           controllerMethods.eventLoop controller, evt, resolve
         else
           resolve()
+      .catch promiseError
 
 
   StemSingleton = new Stem
