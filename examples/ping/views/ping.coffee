@@ -9,7 +9,7 @@ define [
 
     init: ->  
       @pingController = new PingController()
-      @waitOn @pingController.eventDeferred 'load'
+      @waitOn @pingController.Promise 'load'
 
     appeared: ->
       @pingController.on 'update', ({ping}) =>        

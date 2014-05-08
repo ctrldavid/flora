@@ -11,8 +11,8 @@ define [
       'change .js-nickname': 'rename'
 
     init: ->
-      @authController = new AuthController
-      @waitOn @authController.eventDeferred 'load'
+      @authController = new AuthController      
+      @waitOn @authController.Promise 'load'
     
       @pingController = new PingController()
 

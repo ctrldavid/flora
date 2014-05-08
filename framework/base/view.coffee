@@ -53,11 +53,9 @@ define [
   ###
   viewMethods =
     lifecycle: (view, evt) ->
-      dfd = $.Deferred()
-      view[evt]?()
-      viewMethods.eventLoop(view, evt).then ->
-        dfd.resolve()
-      dfd.promise()
+      new Promise (resolve, reject) ->
+        view[evt]?()
+        viewMethods.eventLoop(view, evt, resolve)
 
     init: (view) ->
       viewMethods.lifecycle(view, 'init').then ->
@@ -83,24 +81,27 @@ define [
         # for the current view. (If the view has no parent then
         # $.when(undefined) will resolve immediately)
         # or if the parent is already _live $.when(true) will also resolve immediately
-        $.when(view.parent?._live || view.parent?.eventDeferred 'appeared').then ->
+        appear = ->
           # call view.attach() to get attachment logic.
           # view.parentElement.append view.el
           attachMethods.append view
           view._live = true
           view.appeared?()
           view.trigger 'appeared'
+          
+        if view.parent?
+          view.parent.Promise('appeared').then appear
+        else
+          appear()
 
-    eventLoop: (view, evt, dfd) ->
-      dfd ?= $.Deferred()
+    eventLoop: (view, evt, resolve) ->
       view.trigger evt
-      $.when.apply($, view._waits).then ->
+      Promise.all(view._waits).then ->
         if view._waits.length > 0
           view._waits = []
-          viewMethods.eventLoop view, evt, dfd
+          viewMethods.eventLoop view, evt, resolve
         else
-          dfd.resolve()
-      dfd.promise()
+          resolve()
 
   attachMethods =
     append: (view) ->
@@ -120,15 +121,16 @@ define [
       @_subviews = []
       @_live = false
       @locals = {}
+      @_promises = {}
+      for event in ['init', 'inited', 'load', 'loaded', 'render', 'rendered', 'appear', 'appeared']
+        do (event) =>
+          @_promises[event] = new Promise (resolve, reject) =>
+            @once event, resolve
 
       # Start loading the page immediately
       viewMethods.init this
 
-    # Helper method for turning an event into a deferred that can be waited on.
-    eventDeferred: (evt) ->
-      dfd = $.Deferred()
-      @once evt, dfd.resolve
-      dfd.promise()
+    Promise: (evt) -> return @_promises[evt]
 
     waitOn: (dfd) ->
       @_waits.push dfd
@@ -149,14 +151,14 @@ define [
       view.parent = this
       @_subviews.push view
 
-      # Return a deferred that resolves when the view renders so the caller
-      # can wait on it.
-      dfd = view.eventDeferred 'appeared'
 
       # Start the appearing process
       view.appendTo target
 
-      return dfd
+      # Return a promise that resolves when the view renders so the caller
+      # can wait on it.
+      view.Promise 'appeared'
+
 
     #attach: (methods) -> methods.append
     attach: ->

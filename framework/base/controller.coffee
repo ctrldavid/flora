@@ -1,9 +1,8 @@
 define [
   'underscore'
   'backbone'
-  '$'
   'events'
-], (_, Backbone, $, Events) ->
+], (_, Backbone, Events) ->
 
   class Channel extends Events
     constructor: (@name, @stem) ->
@@ -34,10 +33,8 @@ define [
 
 
     receive: (message) =>
-      # console.log 'message', message
       data = JSON.parse message.data
       @trigger 'receive', data
-      # console.log @listeners
       if data.channel? && data.command? && @listeners[data.channel]? && @listeners[data.channel][data.command]?
         for listener in @listeners[data.channel][data.command]
           listener.channels[data.channel][data.command]?.apply listener, [JSON.parse(data.data)]
@@ -48,7 +45,6 @@ define [
       @trigger 'send', frame
 
     registerHandler: (channel, command, controller) ->
-      # console.log 'Registering handler', channel, command, controller
       @listeners[channel] ?= {}
       @listeners[channel][command] ?= []
       @listeners[channel][command].push controller
@@ -56,11 +52,9 @@ define [
 
   controllerMethods =
     lifecycle: (controller, evt) ->
-      dfd = $.Deferred()
-      controller[evt]?()
-      controllerMethods.eventLoop(controller, evt).then ->
-        dfd.resolve()
-      dfd.promise()
+      new Promise (resolve, reject) ->
+        controller[evt]?()
+        controllerMethods.eventLoop(controller, evt, resolve)
 
     init: (controller) ->
       controllerMethods.lifecycle(controller, 'init').then ->
@@ -74,16 +68,14 @@ define [
         controller.trigger 'loaded'
         # controllerMethods.render controller
 
-    eventLoop: (controller, evt, dfd) ->
-      dfd ?= $.Deferred()
+    eventLoop: (controller, evt, resolve) ->
       controller.trigger evt
-      $.when.apply($, controller._waits).then ->
+      Promise.all(controller._waits).then ->
         if controller._waits.length > 0
           controller._waits = []
-          controllerMethods.eventLoop controller, evt, dfd
+          controllerMethods.eventLoop controller, evt, resolve
         else
-          dfd.resolve()
-      dfd.promise()
+          resolve()
 
 
   StemSingleton = new Stem
@@ -92,7 +84,17 @@ define [
   class Controller extends Events
     constructor: ->
       super
+
+      # @on 'all', ->
+      #   console.log 'Controller event', arguments
+
       @_waits = []
+      @_promises = {}
+      for event in ['init', 'inited', 'load', 'loaded']
+        do (event) =>
+          @_promises[event] = new Promise (resolve, reject) =>
+            @once event, resolve
+        
       
       # Start when the websocket connection is ready
       ready = =>
@@ -106,11 +108,7 @@ define [
       else
         StemSingleton.on 'ready', ready
 
-    # Helper method for turning an event into a deferred that can be waited on.
-    eventDeferred: (evt) ->
-      dfd = $.Deferred()
-      @once evt, dfd.resolve
-      dfd.promise()
+    Promise: (evt) -> return @_promises[evt]
 
     waitOn: (dfd) ->
       @_waits.push dfd
@@ -120,7 +118,6 @@ define [
 
     send: (channel, command, data, id) ->
       StemSingleton.send {channel, command, id, data}
-      # console.log {channel, command, data}
 
     # Singleton
     @instance: ->
