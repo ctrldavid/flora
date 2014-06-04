@@ -183,6 +183,8 @@ define [
     reRender: ->
       # Not sure how this should work, perhaps a full reset, or just start with
       # 'loaded' and continue from there?
+      @$el.empty()
+      viewMethods.render this
 
 
   return View
