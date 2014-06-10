@@ -80,6 +80,7 @@ define [
       viewMethods.lifecycle(view, 'render').then ->
         view.rendered?()
         view.trigger 'rendered'
+        viewMethods.appear view
       .catch promiseError
 
     appear: (view) ->
@@ -146,7 +147,7 @@ define [
 
     appendTo: (targetElement) ->
       @parentElement = targetElement
-      viewMethods.appear this
+      # viewMethods.appear this
 
     prepend: (target, view) ->
       console.error 'NYI'
@@ -166,12 +167,12 @@ define [
 
       # Return a promise that resolves when the view renders so the caller
       # can wait on it.
-      view.Promise 'appeared'
+      view.Promise 'rendered'
 
 
     #attach: (methods) -> methods.append
-    attach: ->
-      viewMethods.appear this
+    # attach: ->
+    #   viewMethods.appear this
 
     detach: ->
       @$el.detach()
