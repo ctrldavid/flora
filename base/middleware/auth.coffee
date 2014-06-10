@@ -2,7 +2,7 @@ redis = require 'redis'
 client = redis.createClient()
 
 client.select 1, () ->
-  console.log 'gyar... fibres?'
+  console.log '(auth middleware) gyar... fibres?'
 
 exports.Auth = (message, next) ->
   connectionID = message.connectionid.toString()
