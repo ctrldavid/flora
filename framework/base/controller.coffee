@@ -89,6 +89,8 @@ define [
   StemSingleton = new Stem
   StemSingleton.initialise()
 
+  window.ss = StemSingleton
+
   class Controller extends Events
     constructor: ->
       super

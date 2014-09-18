@@ -37,3 +37,21 @@ module.exports.run = ->
       path.join process.cwd(), controllerPath
       
     handler.load controller for controller in controllers
+
+
+  # Maybe using a channel is better than a controller
+  if argv.x? or argv.x?
+    log 'Channel test'
+
+    loader = require './channel'
+
+    # or argv.x can be either a string or an array of strings.
+    # Array.prototype.concat works with both, so we can cheat a little.
+    channelHandlers = []
+    channelHandlers = channelHandlers.concat argv.x if argv.x?
+
+    # Need to make the paths absolute
+    channelHandlers = channelHandlers.map (controllerPath) ->
+      path.join process.cwd(), controllerPath
+      
+    loader.load channelHandler for channelHandler in channelHandlers  
