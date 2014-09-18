@@ -31,7 +31,15 @@ html(xmlns="http://www.w3.org/1999/xhtml")
       }());
     script(type='text/javascript').
       (function(){
+        var maxErrors = 3;
+
         window.onerror = function(err, url, line){
+          if (maxErrors == 0) {
+            console.log("Refusing to log more errors, shit\'s far too broke.");
+            return;
+          }
+
+          maxErrors--;
           console.log("Error", arguments);
           var req = new XMLHttpRequest();
           req.open("POST", "http://rest.zk.io/flora/errors/");

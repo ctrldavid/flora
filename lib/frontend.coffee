@@ -46,14 +46,15 @@ compileTargets =
     'gif': (data) -> data
 
 compiledServe = (dirs, exts) ->
-  ({params: [filename, type]}, res) ->
+  ({params: [filename, type], headers}, res) ->
+
     for directory in dirs
       for ext, handler of exts
         filePath = path.join directory, "#{filename}.#{ext}"
         #console.log "Trying #{filePath}"
         continue unless futures.isFile(filePath).wait()
         data = futures.readFile(filePath).wait()
-        log "#{type}: #{filename} -> #{filePath}"
+        #log "#{headers['x-real-ip']} #{type}: #{filename} -> #{filePath}"
         res.contentType type
         res.send handler data
         return
@@ -82,6 +83,7 @@ listen = (applicationPath="/", port = 3000) ->
   app.get /^\/(.*)\.(png|jpg|jpeg|gif)$/, compiledServe sourceDirectories, compileTargets.images
 
   app.get '*', (req, res) ->
+    log "Main page request from #{req.headers['x-real-ip']}"
     res.type 'xhtml'
     res.render 'index.jade'
 

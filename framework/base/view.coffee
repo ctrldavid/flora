@@ -126,6 +126,8 @@ define [
     constructor: ->
       # this.on 'all', (evt) ->
       #  console.log 'EVT', this.constructor.name, evt
+      console.time this.constructor.name
+      @once 'appeared', -> console.timeEnd this.constructor.name
       super
       @_waits = []
       @_subviews = []

@@ -27,7 +27,9 @@ define [
 
       @_initialised = true
       @_ready = false
+      console.time 'ws'
       @ws.onopen = =>
+        console.timeEnd 'ws'
         @_ready = true
         @trigger 'ready'
 
