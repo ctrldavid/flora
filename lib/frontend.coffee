@@ -44,6 +44,9 @@ compileTargets =
     'jpg': (data) -> data
     'jpeg': (data) -> data
     'gif': (data) -> data
+    'bmp': (data) -> data
+  'text':
+    'txt': (data) -> data
 
 compiledServe = (dirs, exts) ->
   ({params: [filename, type], headers}, res) ->
@@ -70,6 +73,12 @@ listen = (applicationPath="/", port = 3000) ->
   app = express()
   app.set 'views', frameworkPath
 
+  app.use (req, res, next) ->
+    res.set "Access-Control-Allow-Origin", "*"
+    res.set "Access-Control-Allow-Headers", "Content-Type"
+    res.set "Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE"
+    next()
+
   # Respond to all requests using fibers
   app.use (req, res, next) -> next.future()()
 
@@ -79,8 +88,15 @@ listen = (applicationPath="/", port = 3000) ->
   # css file handling
   app.get /^\/(.*)\.(css)$/, compiledServe sourceDirectories, compileTargets.css
 
+  # text file handling
+  app.get /^\/(.*)\.(txt)$/, compiledServe sourceDirectories, compileTargets.text
+
   # Images
-  app.get /^\/(.*)\.(png|jpg|jpeg|gif)$/, compiledServe sourceDirectories, compileTargets.images
+  app.get /^\/(.*)\.(png|jpg|jpeg|gif|bmp)$/, compiledServe sourceDirectories, compileTargets.images
+
+  app.get '/favicon.ico', (req, res) ->
+    log "404ing favicon.ico for now."
+    res.send 404, ''
 
   app.get '*', (req, res) ->
     log "Main page request from #{req.headers['x-real-ip']}"

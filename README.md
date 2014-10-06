@@ -1,6 +1,11 @@
 flora framework
 ---------------
 
+Installing as an npm dependency:
+
+npm install --save git+ssh://git@github.com:ctrldavid/flora.git
+
+
 to get it all working:
 
 * clone the repo  
