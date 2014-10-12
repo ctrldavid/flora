@@ -55,5 +55,7 @@ require [
   'main'
   'promise' # Shim for ES6 promises.
 ], (Main) ->
-  document.getElementById('loader').style.display = 'none'
+  #document.getElementById('loader').style.display = 'none'
+  loader = document.getElementById 'loader'
+  loader.parentElement.removeChild loader
 
