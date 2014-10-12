@@ -6,6 +6,7 @@ define [
 
   class Application extends View
     constructor: ->
+      @App = this
       @once 'appear', =>
         @waitOn new Promise (resolve, reject) -> $ -> resolve()
         @once 'appear', => @appendTo $ 'body'

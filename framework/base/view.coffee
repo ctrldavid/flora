@@ -140,7 +140,12 @@ define [
             @once event, resolve
 
       # Start loading the page immediately
-      viewMethods.init this
+      # viewMethods.init this
+      # Orrrrrr, start loading on the next tick so that the parent's append method
+      # can fire and we get a reference to @App in the init method...
+      window.setTimeout =>
+        viewMethods.init this
+      , 0
 
     Promise: (evt) -> return @_promises[evt]
 
@@ -161,6 +166,7 @@ define [
         target = @$el.find target
 
       view.parent = this
+      view.App = @App
       @_subviews.push view
 
 
