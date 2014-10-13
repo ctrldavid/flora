@@ -51,9 +51,8 @@ define [
 
 
   ###
-
-  promiseError = (error) ->
-    console.error "Error in View", error
+  promiseError = (view, method) -> (error) ->
+    console.error "Error in View #{view.constructor.name} method #{method}", error
 
   viewMethods =
     lifecycle: (view, evt) ->
@@ -66,14 +65,14 @@ define [
         view.inited?()
         view.trigger 'inited'
         viewMethods.load view
-      .catch promiseError
+      .catch promiseError view, 'init'
 
     load: (view) ->
       viewMethods.lifecycle(view, 'load').then ->
         view.loaded?()
         view.trigger 'loaded'
         viewMethods.render view
-      .catch promiseError
+      .catch promiseError view, 'load'
 
     render: (view) ->
       view.$el.append view.template view.locals
@@ -81,7 +80,7 @@ define [
         view.rendered?()
         view.trigger 'rendered'
         viewMethods.appear view
-      .catch promiseError
+      .catch promiseError view, 'render'
 
     appear: (view) ->
       viewMethods.lifecycle(view, 'appear').then ->
@@ -98,10 +97,10 @@ define [
           view.trigger 'appeared'
           
         if view.parent?
-          view.parent.Promise('appeared').then(appear).catch promiseError
+          view.parent.Promise('appeared').then(appear).catch promiseError view, 'appeared?'
         else
           appear()
-      .catch promiseError
+      .catch promiseError view, 'appear'
 
     eventLoop: (view, evt, resolve) ->
       view.trigger evt
@@ -111,7 +110,7 @@ define [
           viewMethods.eventLoop view, evt, resolve
         else
           resolve()
-      .catch promiseError
+      .catch promiseError view, evt
       
   attachMethods =
     append: (view) ->
