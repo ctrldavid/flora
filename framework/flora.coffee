@@ -41,6 +41,7 @@ require.config
     $: 'vendor/jquery-2.1.0.min'
     moment: 'vendor/moment'
     'jade.runtime': 'vendor/jade.runtime'
+    react: 'vendor/react-0.11.2'
     
     promise: 'vendor/promise-0.1.1.min'
 

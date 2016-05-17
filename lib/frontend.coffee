@@ -7,6 +7,7 @@ stylus = require 'stylus'
 nib = require 'nib'
 Future = require 'fibers/future'
 Fiber = require 'fibers'
+reactTools = require 'react-tools'
 
 log = require('./log').bind 'Frontend', 20
 
@@ -36,6 +37,30 @@ compileTargets =
     'jade': (data) ->
       template = jade.compileClient data.toString(), {pretty: false, compileDebug: false}
       return "define(['jade.runtime'],function(jade){return #{template};});"
+    'jsx': (data) ->
+      #reactTools.transform "/** @jsx React.DOM */define(['react'], function(React){return #{data.toString()};});"
+      reactTools.transform "/** @jsx React.DOM */define(['react'], function(React){return function(){return #{data.toString()};};});"
+      #reactTools.transform "/** @jsx React.DOM */define(['react'], function(React){return React.createClass({render: function(){return #{data.toString()};}});});"      
+      # reactTools.transform """
+      # /** @jsx React.DOM */
+      # define(['react'], function(React){
+      #   return function template(locals){
+      #     var x = React.createClass({
+      #       getInitialState: function() {
+      #         console.log("locals", locals);
+      #         return locals;
+      #       },
+      #       render: function(){
+      #         return #{data.toString()};
+      #       }
+      #     });
+      #     var mountNode = document.createElement('div');
+      #     React.renderComponent(x(locals), mountNode);
+      #     return mountNode.children; //Might have to make this just mountNode
+      #   };
+      # });
+      # """
+
   'css':
     'css': (data) -> data
     'styl': (data) -> futures.stylusRender(data.toString()).wait()

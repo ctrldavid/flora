@@ -22,7 +22,7 @@ class Channel
     serverSub.on 'message', (path, data) =>
       data = JSON.parse "#{data}" # data comes in as a slowbuffer from ZMQ
       #@log "#{@c '->'} #{@s data.connectionid} #{@c path}. Data:#{@c JSON.stringify data}"
-      @log "#{@c '->'} #{@s data.connectionid} #{@c path}."
+      # @log "#{@c '->'} #{@s data.connectionid} #{@c path}."
 
       if @handlers?[path]?
         handler.apply this, [data] for handler in @handlers[path]
